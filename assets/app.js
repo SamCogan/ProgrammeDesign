@@ -3622,6 +3622,13 @@ function renderRoadmap() {
         </div>
 
         <div class="roadmap-section">
+            <h3>♿ Universal Design for Learning (UDL) Coverage</h3>
+            <p class="text-muted small">Heatmap showing which modules address each UDL guideline. <span style="color: #28a745; font-weight: bold;">●</span> = Evidence documented, <span style="color: #e9ecef; font-weight: bold;">●</span> = Not addressed</p>
+            
+            ${renderUDLHeatmap()}
+        </div>
+
+        <div class="roadmap-section">
             <h3>Key Differentiators</h3>
             <ul class="roadmap-list">
                 ${appState.differentiators.map(d => `<li>${escapeHtml(d)}</li>`).join('')}
@@ -3630,6 +3637,111 @@ function renderRoadmap() {
     `;
 
     container.innerHTML = html;
+}
+
+/**
+ * Render UDL Evidence heatmap for roadmap
+ */
+function renderUDLHeatmap() {
+    if (!appState.modules || appState.modules.length === 0) {
+        return '<p class="text-muted"><em>No modules yet. Add modules to see UDL coverage.</em></p>';
+    }
+
+    // Define UDL structure
+    const udlDimensions = {
+        representation: {
+            label: '📊 Representation',
+            sublevels: ['Perception', 'Language', 'Comprehension']
+        },
+        actionExpression: {
+            label: '🎯 Action & Expression',
+            sublevels: ['PhysicalAction', 'Expression', 'Executive']
+        },
+        engagement: {
+            label: '💡 Engagement',
+            sublevels: ['Recruiting', 'Sustaining', 'SelfRegulation']
+        }
+    };
+
+    // Build matrix data
+    const modules = appState.modules;
+    const allSublevels = [];
+    Object.values(udlDimensions).forEach(dim => {
+        dim.sublevels.forEach(sub => {
+            allSublevels.push({ dimension: Object.keys(udlDimensions).find(k => udlDimensions[k] === dim), sublevel: sub });
+        });
+    });
+
+    // Create heatmap HTML
+    let html = `
+        <div style="overflow-x: auto; margin-top: 1rem;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                    <tr>
+                        <th style="padding: 0.75rem; text-align: left; background-color: #f8f9fa; border: 1px solid #dee2e6; min-width: 180px;"><strong>UDL Guideline</strong></th>
+                        ${modules.map(mod => `
+                            <th style="padding: 0.5rem; text-align: center; background-color: #f8f9fa; border: 1px solid #dee2e6; min-width: 120px; word-wrap: break-word;">
+                                <small><strong>${escapeHtml(mod.title.substring(0, 20))}</strong></small>
+                            </th>
+                        `).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${allSublevels.map(item => {
+                        const dimensionKey = item.dimension;
+                        const sublevel = item.sublevel;
+                        const displayLabel = {
+                            'Perception': '👁️ Perception',
+                            'Language': '🔤 Language & Symbols',
+                            'Comprehension': '🧠 Comprehension',
+                            'PhysicalAction': '🖱️ Physical Action',
+                            'Expression': '🗣️ Expression',
+                            'Executive': '⚙️ Executive Functions',
+                            'Recruiting': '🎪 Recruiting Attention',
+                            'Sustaining': '💪 Sustaining Effort',
+                            'SelfRegulation': '⚖️ Self-Regulation'
+                        }[sublevel] || sublevel;
+
+                        return `
+                            <tr>
+                                <td style="padding: 0.75rem; text-align: left; border: 1px solid #dee2e6; background-color: #f8f9fa;">
+                                    <small><strong>${displayLabel}</strong></small>
+                                </td>
+                                ${modules.map(mod => {
+                                    const evidence = mod.udlEvidence?.find(e => e.dimension === dimensionKey && e.sublevel === sublevel);
+                                    const hasEvidence = evidence && evidence.evidence;
+                                    const bgColor = hasEvidence ? '#d4edda' : '#f8f9fa';
+                                    const borderColor = hasEvidence ? '#28a745' : '#dee2e6';
+                                    const title = hasEvidence ? `Evidence: ${evidence.evidence.substring(0, 100)}...` : 'No evidence documented';
+                                    
+                                    return `
+                                        <td style="padding: 0.5rem; text-align: center; border: 1px solid ${borderColor}; background-color: ${bgColor}; cursor: pointer;" 
+                                            title="${escapeHtml(title)}"
+                                            onmouseover="this.style.backgroundColor='${hasEvidence ? '#c3e6cb' : '#e9ecef'}'; this.style.boxShadow='0 0 4px rgba(0,0,0,0.1)';"
+                                            onmouseout="this.style.backgroundColor='${bgColor}'; this.style.boxShadow='none';">
+                                            <span style="font-size: 1.2rem;">${hasEvidence ? '✓' : '–'}</span>
+                                        </td>
+                                    `;
+                                }).join('')}
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 1.5rem; padding: 1rem; background-color: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
+            <p><strong>Coverage Summary:</strong></p>
+            <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+                ${modules.map(mod => {
+                    const totalEvidence = mod.udlEvidence?.filter(e => e.evidence)?.length || 0;
+                    return `<li>${escapeHtml(mod.title)}: <strong>${totalEvidence}/9</strong> UDL guidelines addressed</li>`;
+                }).join('')}
+            </ul>
+        </div>
+    `;
+
+    return html;
 }
 
 // ===== EXPORT TAB =====
