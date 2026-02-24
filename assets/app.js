@@ -555,6 +555,11 @@ document.addEventListener('click', (e) => {
         showModulesManager();
     }
 
+    // Quick Add Module
+    if (e.target.classList.contains('btn-quick-add-module')) {
+        showQuickAddModuleModal();
+    }
+
     // Backward Design - Exit Capabilities
     if (e.target.classList.contains('btn-add-exit-capability')) {
         showAddExitCapabilityModal();
@@ -901,7 +906,8 @@ function renderCanvasTile(tileId) {
                         </div>
                     `).join('')}
                     ${appState.modules && appState.modules.length > 3 ? `<p class="small text-muted">+ ${appState.modules.length - 3} more</p>` : ''}
-                    <button type="button" class="btn btn-sm btn-primary mt-2 btn-manage-modules">📋 Manage Modules</button>
+                    <button type="button" class="btn btn-sm btn-success me-2 mt-2 btn-quick-add-module">+ Add Module</button>
+                    <button type="button" class="btn btn-sm btn-primary mt-2 btn-manage-modules">📋 Manage</button>
                 </div>
             `;
 
@@ -1793,6 +1799,98 @@ function addNewModule() {
     saveToLocalStorage();
     showToast('Module created. Click Edit to configure details.', 'success');
     showModuleEditor(newModule.id);
+}
+
+/**
+ * Show quick-add module modal for Canvas ideation flow
+ */
+function showQuickAddModuleModal() {
+    const html = `
+        <div class="modal fade" id="quickAddModuleModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">➕ Create New Module</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Module Title *</label>
+                            <input type="text" id="quickModuleTitle" class="form-control" placeholder="e.g., Data Structures" autofocus>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Credits</label>
+                                    <input type="number" id="quickModuleCredits" class="form-control" value="10" min="1" max="60">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Semester</label>
+                                    <input type="number" id="quickModuleSemester" class="form-control" value="${(appState.modules?.length || 0) + 1}" min="1" max="8">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info small">
+                            <strong>💡 Tip:</strong> Create the module here, then jump to Module Studio to add learning outcomes and assessments.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" id="saveQuickModule">Create & Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    let modalEl = document.getElementById('quickAddModuleModal');
+    if (modalEl) modalEl.remove();
+    document.body.insertAdjacentHTML('beforeend', html);
+    modalEl = document.getElementById('quickAddModuleModal');
+
+    // Handle save
+    document.getElementById('saveQuickModule').addEventListener('click', () => {
+        const title = document.getElementById('quickModuleTitle').value.trim();
+        const credits = parseInt(document.getElementById('quickModuleCredits').value) || 10;
+        const semester = parseInt(document.getElementById('quickModuleSemester').value) || 1;
+
+        if (!title) {
+            showToast('Module title is required', 'warning');
+            return;
+        }
+
+        if (!appState.modules) appState.modules = [];
+
+        const newModule = {
+            id: generateId('mod'),
+            title,
+            credits,
+            semester,
+            learningOutcomes: [],
+            assessments: [],
+            learningExperience: {
+                description: '',
+                weeklyRhythm: [],
+                notes: ''
+            },
+            udlEvidence: []
+        };
+
+        appState.modules.push(newModule);
+        saveToLocalStorage();
+        showToast(`Module "${title}" created! Opening editor...`, 'success');
+        
+        // Close modal and show module editor
+        const bsModal = bootstrap.Modal.getInstance(modalEl);
+        bsModal.hide();
+        showModuleEditor(newModule.id);
+        renderCanvasTile('modules');
+    });
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
 }
 
 /**
@@ -3497,12 +3595,30 @@ function renderRoadmap() {
 
         <div class="roadmap-section">
             <h3>Risks & Mitigations</h3>
-            <ul class="roadmap-list">
-                ${appState.risksAndAssumptions.map(risk => `
-                    <li><strong>Risk:</strong> ${escapeHtml(risk.risk)}<br>
-                        <strong>Mitigation:</strong> ${escapeHtml(risk.mitigation)}</li>
-                `).join('')}
-            </ul>
+            ${appState.risksAndAssumptions.length === 0 ? '<p><em>No risks documented</em></p>' : `
+            <div style="margin-top: 1rem;">
+                ${['Academic', 'Operational', 'Market', 'Other'].map(category => {
+                    const risksInCategory = appState.risksAndAssumptions.filter(r => r.category === category);
+                    if (risksInCategory.length === 0) return '';
+                    return `
+                        <div style="margin-bottom: 1.5rem; padding: 0.75rem; background-color: #f8f9fa; border-left: 4px solid ${
+                            category === 'Academic' ? '#ffc107' : category === 'Operational' ? '#17a2b8' : category === 'Market' ? '#dc3545' : '#6c757d'
+                        }; border-radius: 4px;">
+                            <h5 style="margin-top: 0; font-size: 0.95rem;"><strong>${category} Risks (${risksInCategory.length})</strong></h5>
+                            <ul style="margin-bottom: 0; padding-left: 1.5rem;">
+                                ${risksInCategory.map(risk => `
+                                    <li style="margin-bottom: 0.5rem;">
+                                        <strong>Risk:</strong> ${escapeHtml(risk.risk)}<br>
+                                        <strong>Assumption:</strong> ${escapeHtml(risk.assumption)}<br>
+                                        <strong>Mitigation:</strong> ${escapeHtml(risk.mitigation)}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+            `}
         </div>
 
         <div class="roadmap-section">
