@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programme Design Studio</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-bs-theme="light">
+    <div class="d-flex h-100 flex-column">
+        <!-- Header -->
+        <header class="bg-primary text-white py-3 shadow-sm">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="mb-0 fs-4">🎨 Programme Design Studio</h1>
+                        <small class="text-light">Ideation Tool for QQI Programmes</small>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-sm btn-light me-2" id="btnLoadExample" title="Load example programme">
+                            📖 Load Example
+                        </button>
+                        <button class="btn btn-sm btn-light me-2" id="btnImport" title="Import saved JSON">
+                            📥 Import
+                        </button>
+                        <button class="btn btn-sm btn-success me-2" id="btnExport" title="Export current work">
+                            📥 Export
+                        </button>
+                        <button class="btn btn-sm btn-warning me-2" id="btnReset" title="Reset to blank">
+                            🔄 Reset
+                        </button>
+                        <span class="badge bg-success" id="autoSaveStatus">Auto-saved</span>
+                    </div>
+                </div>
+            </div>
+            <input type="file" id="fileInput" accept=".json" style="display: none;">
+        </header>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 d-flex overflow-hidden">
+            <!-- Left Sidebar (Tab Navigation) -->
+            <nav class="bg-light border-end p-3 overflow-y-auto" style="width: 180px;">
+                <div class="nav flex-column nav-pills" id="tabNav" role="tablist">
+                    <button class="nav-link active" id="tabCanvas" data-bs-toggle="pill" data-bs-target="#contentCanvas" type="button" role="tab">
+                        🖼️ Canvas
+                    </button>
+                    <button class="nav-link" id="tabBackwardDesign" data-bs-toggle="pill" data-bs-target="#contentBackwardDesign" type="button" role="tab">
+                        🎯 Backward Design
+                    </button>
+                    <button class="nav-link" id="tabAlignment" data-bs-toggle="pill" data-bs-target="#contentAlignment" type="button" role="tab">
+                        🔗 Alignment Map
+                    </button>
+                    <button class="nav-link" id="tabAssessment" data-bs-toggle="pill" data-bs-target="#contentAssessment" type="button" role="tab">
+                        ✏️ Assessment Studio
+                    </button>
+                    <button class="nav-link" id="tabCOI" data-bs-toggle="pill" data-bs-target="#contentCOI" type="button" role="tab">
+                        🌊 Learning Experience
+                    </button>
+                    <button class="nav-link" id="tabRoadmap" data-bs-toggle="pill" data-bs-target="#contentRoadmap" type="button" role="tab">
+                        🗺️ Roadmap
+                    </button>
+                    <button class="nav-link" id="tabExport" data-bs-toggle="pill" data-bs-target="#contentExport" type="button" role="tab">
+                        📤 Export
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <div class="flex-grow-1 overflow-y-auto">
+                <div class="tab-content p-4" id="tabContent">
+                    <!-- CANVAS TAB -->
+                    <div class="tab-pane fade show active" id="contentCanvas" role="tabpanel">
+                        <h2 class="mb-4">Canvas: Programme Ideation</h2>
+                        <div class="row g-4" id="canvasTiles">
+                            <!-- Tiles will be rendered here by JS -->
+                        </div>
+                    </div>
+
+                    <!-- BACKWARD DESIGN TAB -->
+                    <div class="tab-pane fade" id="contentBackwardDesign" role="tabpanel">
+                        <!-- Dynamically populated by renderBackwardDesign() -->
+                    </div>
+
+                    <!-- ALIGNMENT MAP TAB -->
+                    <div class="tab-pane fade" id="contentAlignment" role="tabpanel">
+                        <h2 class="mb-3">Constructive Alignment Map</h2>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 className="mb-0">Outcomes ↔ Assessments Mapping</h5>
+                                    </div>
+                                    <div class="card-body overflow-x-auto">
+                                        <table class="table table-sm table-bordered" id="alignmentTable">
+                                            <!-- Dynamically generated by JS -->
+                                        </table>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-primary mt-3" id="btnGeneratePLOs">
+                                    ✨ Generate Draft PLOs from Capabilities
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card border-warning">
+                                    <div class="card-header bg-warning">
+                                        <h5 class="mb-0">Coverage Warnings</h5>
+                                    </div>
+                                    <div class="card-body" id="alignmentWarnings">
+                                        <p class="text-muted small">None detected</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ASSESSMENT STUDIO TAB -->
+                    <div class="tab-pane fade" id="contentAssessment" role="tabpanel">
+                        <h2 class="mb-3">Assessment Studio: Backward Design</h2>
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div id="assessmentList">
+                                    <!-- Assessment cards will be rendered here -->
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Assessment Patterns</h5>
+                                    </div>
+                                    <div class="card-body small" id="patternLibrary">
+                                        <!-- Patterns will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LEARNING EXPERIENCE TAB -->
+                    <div class="tab-pane fade" id="contentCOI" role="tabpanel">
+                        <!-- Dynamically populated by renderLearningExperience() -->
+                    </div>
+
+                    <!-- ROADMAP TAB -->
+                    <div class="tab-pane fade" id="contentRoadmap" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="mb-0">Roadmap: Printable Summary</h2>
+                            <button class="btn btn-primary" onclick="window.print();">
+                                🖨️ Print to PDF
+                            </button>
+                        </div>
+                        <div id="roadmapContent" class="roadmap-print">
+                            <!-- Roadmap content will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- EXPORT TAB -->
+                    <div class="tab-pane fade" id="contentExport" role="tabpanel">
+                        <h2 class="mb-4">Export Programme</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Export Options</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-success w-100 mb-2" id="btnDownloadFull">
+                                            📥 Download Full JSON
+                                        </button>
+                                        <button class="btn btn-info w-100" id="btnDownloadHandoff">
+                                            📥 Download Handoff JSON (for programmedev)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Programme JSON (Read-only)</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex gap-2 mb-2">
+                                            <button class="btn btn-sm btn-outline-primary" id="btnCopyJSON">
+                                                📋 Copy to Clipboard
+                                            </button>
+                                            <span id="copyNotification" class="text-success small" style="display:none;">Copied!</span>
+                                        </div>
+                                        <pre id="jsonPreview" class="border rounded p-3" style="font-size: 12px; max-height: 400px; overflow-y: auto; background: #f8f9fa;">
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+    <!-- Modals -->
+    <!-- Assessment Detail Modal -->
+    <div class="modal fade" id="assessmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assessmentModalTitle">Edit Assessment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="assessmentModalBody">
+                    <!-- Dynamically populated -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveAssessment">Save Assessment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modules Manager Modal -->
+    <div class="modal fade" id="modulesManagerModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modules Manager</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modulesManagerBody">
+                    <!-- Dynamically populated -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" id="btnAddModuleFromManager">+ Add Module</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module Editor Modal -->
+    <div class="modal fade" id="moduleEditorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="moduleEditorTitle">Edit Module</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="moduleEditorBody">
+                    <!-- Dynamically populated -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveModule">Save Module</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exit Capability Modal -->
+    <div class="modal fade" id="exitCapabilityModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exitCapabilityModalTitle">Add Exit Capability</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Capability Statement</strong></label>
+                        <textarea class="form-control" id="exitCapabilityText" rows="3" placeholder="What must be true about a graduate?"></textarea>
+                        <small class="form-text text-muted">Use performance language: "design", "lead", "integrate", not "understand" or "describe"</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Tags</strong> (select or add custom)</label>
+                        <div id="tagsContainer" class="mb-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input capability-tag-checkbox" type="checkbox" id="tag-Strategic" value="Strategic">
+                                <label class="form-check-label" for="tag-Strategic">Strategic</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input capability-tag-checkbox" type="checkbox" id="tag-Leadership" value="Leadership">
+                                <label class="form-check-label" for="tag-Leadership">Leadership</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input capability-tag-checkbox" type="checkbox" id="tag-Analytics" value="Analytics">
+                                <label class="form-check-label" for="tag-Analytics">Analytics</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input capability-tag-checkbox" type="checkbox" id="tag-Operations" value="Operations">
+                                <label class="form-check-label" for="tag-Operations">Operations</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input capability-tag-checkbox" type="checkbox" id="tag-Innovation" value="Innovation">
+                                <label class="form-check-label" for="tag-Innovation">Innovation</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input capability-tag-checkbox" type="checkbox" id="tag-Ethics" value="Ethics">
+                                <label class="form-check-label" for="tag-Ethics">Ethics</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input capability-tag-checkbox" type="checkbox" id="tag-Sustainability" value="Sustainability">
+                                <label class="form-check-label" for="tag-Sustainability">Sustainability</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input capability-tag-checkbox" type="checkbox" id="tag-Digital" value="Digital">
+                                <label class="form-check-label" for="tag-Digital">Digital</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveExitCapability()">Save Capability</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evidence Modal -->
+    <div class="modal fade" id="evidenceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="evidenceModalTitle">Add Evidence</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Evidence Type</strong></label>
+                        <select class="form-select" id="evidenceType">
+                            <option value="">-- Select Type --</option>
+                            <option value="Capstone Project">Capstone Project</option>
+                            <option value="Workplace Intervention">Workplace Intervention</option>
+                            <option value="Simulation">Simulation</option>
+                            <option value="Portfolio">Portfolio</option>
+                            <option value="Consultancy Report">Consultancy Report</option>
+                            <option value="Viva">Viva</option>
+                            <option value="Case Study Analysis">Case Study Analysis</option>
+                            <option value="Research Dissertation">Research Dissertation</option>
+                        </select>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Individual or Group?</strong></label>
+                            <select class="form-select" id="evidenceIndividualOrGroup">
+                                <option value="individual">👤 Individual</option>
+                                <option value="group">👥 Group</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Authenticity Score</strong></label>
+                            <div class="input-group">
+                                <input type="range" class="form-range" id="evidenceAuthenticityScore" min="1" max="5" value="3" style="margin-top: 8px;">
+                                <span class="ms-2" id="authenticityScoreLabel">3/5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Workplace Transfer Relevance</strong></label>
+                            <div class="input-group">
+                                <input type="range" class="form-range" id="evidenceTransferScore" min="1" max="5" value="3" style="margin-top: 8px;">
+                                <span class="ms-2" id="transferScoreLabel">3/5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Notes</strong> (optional)</label>
+                        <textarea class="form-control" id="evidenceNotes" rows="2" placeholder="Additional context..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="saveEvidence()">Save Evidence</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div class="modal fade" id="resetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reset Programme?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This will clear all data and reset to a blank template. This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmReset">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Export Programme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="exportFilename" class="form-label">Filename:</label>
+                        <input type="text" id="exportFilename" class="form-control" placeholder="my-programme" value="programme-design">
+                    </div>
+                    <div class="alert alert-info small">
+                        <strong>Full JSON:</strong> Complete programme data for re-import.<br>
+                        <strong>Handoff JSON:</strong> Simplified schema for import into programmedev tool.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Application JS -->
+    <script src="assets/app.js"></script>
+</body>
+</html>

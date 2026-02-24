@@ -1,0 +1,282 @@
+{
+  "programmeTitle": "MSc Management (Part-Time)",
+  "audience": "Mid-career professionals seeking management credentials without full-time commitment",
+  "audienceConstraints": "2–3 hours/week commitment; work experience 5+ years; geographically dispersed",
+  "valueProposition": "Accredited QQI Level 9; hybrid delivery; applied, peer-learning cohort model",
+  "credits": 90,
+  "nfqLevel": 9,
+  "deliveryMode": "Hybrid (blended synchronous/asynchronous)",
+  "deliveryDuration": "24 months",
+  "deliveryStructure": "12-week semesters (Spring & Autumn); 2-hour live sessions weekly; weekly async work; monthly intensive (optional)",
+  "capabilities": [
+    {
+      "id": "cap-1",
+      "label": "Strategic Leadership",
+      "description": "Apply strategic frameworks to analysate and influence organisational direction"
+    },
+    {
+      "id": "cap-2",
+      "label": "Ethical Decision-Making",
+      "description": "Make principled decisions in complex, ambiguous contexts with stakeholder consideration"
+    },
+    {
+      "id": "cap-3",
+      "label": "Data-Driven Insight",
+      "description": "Interpret quantitative and qualitative data to inform management decisions"
+    },
+    {
+      "id": "cap-4",
+      "label": "Team & Organisational Development",
+      "description": "Design and facilitate change initiatives and build high-performing teams"
+    },
+    {
+      "id": "cap-5",
+      "label": "Global Perspectives",
+      "description": "Understand and navigate cross-cultural and international dimensions of business"
+    },
+    {
+      "id": "cap-6",
+      "label": "Professional Communication",
+      "description": "Articulate management ideas clearly to diverse audiences (written, oral, visual)"
+    }
+  ],
+  "differentiators": [
+    "Cohort-based peer learning (same 20–25 people throughout)",
+    "Case-study driven curriculum rooted in participants' sectors",
+    "Monthly in-person intensives allowing live labs and team projects",
+    "Industry guest lecturers and real consultancy projects",
+    "Integrated ethics and sustainability throughout (not siloed)",
+    "Flexible electives allowing specialization (e.g., HR, Finance, Operations)"
+  ],
+  "draftPLOs": [
+    {
+      "id": "plo-1",
+      "statement": "Analyse complex organisational challenges using established frameworks (e.g., PESTLE, Porter's 5 Forces, balanced scorecard) and synthesise solutions incorporating financial, ethical, and sustainability dimensions.",
+      "level": "Analyse / Evaluate"
+    },
+    {
+      "id": "plo-2",
+      "statement": "Evaluate leadership approaches in light of organisational culture, stakeholder needs, and ethical principles, and propose context-appropriate strategies for team and organisational development.",
+      "level": "Evaluate"
+    },
+    {
+      "id": "plo-3",
+      "statement": "Interpret quantitative and qualitative data from business systems (e.g., financial statements, survey data, market research) and communicate actionable insights to diverse audiences.",
+      "level": "Analyse / Apply"
+    },
+    {
+      "id": "plo-4",
+      "statement": "Design and implement a management project (change initiative, process improvement, or strategy) within an organisational context, leveraging communication, collaboration, and critical reflection.",
+      "level": "Create / Apply"
+    }
+  ],
+  "assessmentPortfolio": [
+    {
+      "id": "assess-1",
+      "title": "Organisational Analysis Case Study",
+      "type": "essay",
+      "evidenceOutputs": ["Written analysis 3000 words", "References and appendices"],
+      "weightingPercent": 25,
+      "individualOrGroup": "individual",
+      "authenticity": 4,
+      "aiRisk": "high",
+      "aiRiskDesignMitigation": "Randomised case studies; Turnitin check; live viva follow-up for borderline grades",
+      "scaffoldSteps": ["Case brief (Week 1)", "Outline submission (Week 2) with tutor feedback", "Draft review (peer, Week 3)", "Final submission (Week 4)"],
+      "feedbackMoments": ["Outline feedback (within 3 days)", "Peer draft feedback (within 5 days)", "Tutor summative feedback"]
+    },
+    {
+      "id": "assess-2",
+      "title": "Group Strategy Project & Live Presentation",
+      "type": "presentation",
+      "evidenceOutputs": ["Strategy document (5000 words, team)", "Live presentation (15 min per person)", "Q&A + peer debate (synchronous)"],
+      "weightingPercent": 35,
+      "individualOrGroup": "group",
+      "authenticity": 5,
+      "aiRiskDesignMitigation": "Live synchronous Q&A; individual oral component; peer assessment of contributions; video recording for attendance evidence",
+      "scaffoldSteps": ["Team formation (Week 1)", "Strategy outline review (Week 3)", "Presentation rehearsal with tutor feedback (Week 5)", "Live presentation + Q&A (Week 6)"],
+      "feedbackMoments": ["Outline feedback", "Rehearsal feedback (tutor)", "Live Q&A (peer + tutor)", "Individual reflection & peer-rated contributions (summative)"]
+    },
+    {
+      "id": "assess-3",
+      "title": "Reflective Learning Portfolio",
+      "type": "portfolio",
+      "evidenceOutputs": ["5 curated artefacts (essay snippets, project outputs, reflections)", "Integrating narrative 1500 words", "Live viva (15 min)"],
+      "weightingPercent": 20,
+      "individualOrGroup": "individual",
+      "authenticity": 4,
+      "aiRiskDesignMitigation": "Live viva component; require specific evidence from formative assessments; tutor verification of authorship",
+      "scaffoldSteps": ["Portfolio brief & exemplar (Week 1)", "Artefact collection plan (Week 4)", "Draft narrative with tutor feedback (Week 8)", "Portfolio + viva (Week 10)"],
+      "feedbackMoments": ["Plan feedback", "Narrative draft feedback", "Live viva + summative feedback"]
+    },
+    {
+      "id": "assess-4",
+      "title": "Continuous Participation & Online Discussion",
+      "type": "discussion",
+      "evidenceOutputs": ["Weekly forum posts (min 250 words)", "Substantive peer replies (2+ per week)", "Reflection on learning from peer engagement (500 words)"],
+      "weightingPercent": 10,
+      "individualOrGroup": "individual",
+      "authenticity": 3,
+      "aiRiskDesignMitigation": "Rubric-based grading of engagement depth (not volume); required evidence of critical synthesis; tutor spot-checks for AI content",
+      "scaffoldSteps": ["Forum guidelines & exemplar post (Week 1)", "Weekly themes & guiding questions", "Tutor moderation & exemplar recognition", "End-of-semester reflection on learning"],
+      "feedbackMoments": ["Weekly tutor prompts (if needed)", "Exemplar recognition (public)", "Reflection + peer feedback summary (summative)"]
+    },
+    {
+      "id": "assess-5",
+      "title": "Data Analysis & Visualisation Assignment",
+      "type": "project",
+      "evidenceOutputs": ["Dataset (provided or student-sourced)", "Analysis document (1500 words)", "Visualisations (2–4 charts/infographics)"],
+      "weightingPercent": 10,
+      "individualOrGroup": "individual",
+      "authenticity": 4,
+      "aiRiskDesignMitigation": "Live code walkthrough; peer review of methodology; data provided to randomise outcomes",
+      "scaffoldSteps": ["Data analysis toolkit & examples (Week 1)", "Analysis plan + dataset selection (Week 3)", "Draft visualisation review (tutor feedback, Week 5)", "Final submission with methodology reflection"],
+      "feedbackMoments": ["Plan feedback", "Draft review feedback", "Summative feedback on analysis quality & insight"]
+    }
+  ],
+  "learningExperience": {
+    "description": "Weekly rhythm for a hybrid, part-time cohort. Each week includes synchronous and asynchronous touchpoints.",
+    "weeklyTemplate": {
+      "monday": "Async: Micro-lecture + reading list released",
+      "wednesdayEvening": "Sync (2hr live session [UTC]): Case discussion, small-group breakouts, live polling, Q&A. Recording provided within 24hr.",
+      "thursday": "Async: Forum opens; students post initial thoughts + questions (peer engagement begins)",
+      "friday": "Async: Students consolidate learning; post substantive replies to peers",
+      "weekend": "Async: Tutor posts synthesis; curates exemplar contributions; flags next week's focus",
+      "repeatingCycles": "Formative mini-quiz mid-week (self-check); tutor office hour Friday 5–6pm (optional, drop-in)"
+    },
+    "principles": [
+      "Apply: Use case/data in live session breakouts",
+      "Discuss: Peer exchange in forums; live debates in sync sessions",
+      "Produce: Individual reflection or group outputs due before next cycle",
+      "Feedback: Peer + tutor + self-assessment integrated throughout"
+    ]
+  },
+  "coiPlan": {
+    "description": "Community of Inquiry presence mapped to 12-week delivery.",
+    "weeks": [
+      {
+        "weekNumber": 1,
+        "theme": "Programme Orientation & Team Identity",
+        "teachingPresence": ["Announcement: Welcome & ground rules", "Live session: Introductions & cohort contract (75 min, plus 15 min social)"],
+        "socialPresence": ["Cohort icebreaker activity (async forum thread)", "Optional: Social breakout rooms (5 min at end of live session)"],
+        "cognitivePresence": ["Trigger: 'Why management? What's your context?'", "Exploration: Peer stories (forum)"]
+      },
+      {
+        "weekNumber": 2,
+        "theme": "Strategic Analysis Frameworks",
+        "teachingPresence": ["Micro-lecture: PESTLE & Porter's 5 Forces", "Live session: Framework application to sector case studies"],
+        "socialPresence": ["Triads assigned (3 people per group for semester); icebreaker task"],
+        "cognitivePresence": ["Trigger: Industry shift case", "Exploration: Breakout analysis", "Integration: Whole cohort debrief"]
+      },
+      {
+        "weekNumber": 3,
+        "theme": "Ethical Leadership & Stakeholder Analysis",
+        "teachingPresence": ["Feedback on Week 1 forum contributions (tutor summary)", "Live session: Ethics case workshop + stakeholder mapping"],
+        "socialPresence": ["Peer triad check-in (10 min, mid-live session)"],
+        "cognitivePresence": ["Trigger: Ethical dilemma scenario", "Exploration: Individual reflection + forum debate", "Integration: Synthesis post from tutor"]
+      },
+      {
+        "weekNumber": 4,
+        "theme": "Group Project Kickoff",
+        "teachingPresence": ["Live session: Project brief, group assignment, team collaboration norms"],
+        "socialPresence": ["Group formation activity (breakout rooms)", "Collaborative document setup"],
+        "cognitivePresence": ["Trigger: Real org challenge to solve", "Exploration: Breakout strategy brainstorm"]
+      },
+      {
+        "weekNumber": 5,
+        "theme": "Data & Insight",
+        "teachingPresence": ["Micro-lecture: Data interpretation & choice of visualisation", "Live session: Guest speaker (data-driven decision making)"],
+        "socialPresence": ["Peer feedback exchange (data analysis drafts, within triads)"],
+        "cognitivePresence": ["Trigger: Messy dataset interpretation", "Exploration: Analysis methods in breakout rooms"]
+      },
+      {
+        "weekNumber": 6,
+        "theme": "Mid-Semester Intensive (in-person or extended sync day)",
+        "teachingPresence": ["8-hour day: Lab sessions, industry consultancy project pitches, tutor office hours"],
+        "socialPresence": ["Meals/breaks as social touchpoints", "Evening networking dinner (optional)"],
+        "cognitivePresence": ["Integration: Lab problem-solving", "Resolution: Real feedback on consultancy projects"]
+      },
+      {
+        "weekNumber": 7,
+        "theme": "Team Development & Change Management",
+        "teachingPresence": ["Feedback on case study outlines (Week 5 submission)", "Live session: Change frameworks & resistance dialogue"],
+        "socialPresence": ["Team project progress share-out (cross-group reporting)"],
+        "cognitivePresence": ["Trigger: Org change failure story", "Exploration: Small group analysis", "Integration: Whole cohort pattern recognition"]
+      },
+      {
+        "weekNumber": 8,
+        "theme": "Communication & Influence",
+        "teachingPresence": ["Micro-lecture: Communication models", "Live session: Presentation coaching + dry-run (volunteer groups)"],
+        "socialPresence": ["Cohort social (20 min at start of live session)"],
+        "cognitivePresence": ["Trigger: Rhetorical effectiveness case", "Exploration: Peer feedback on speaking"]
+      },
+      {
+        "weekNumber": 9,
+        "theme": "Portfolio Reflection & Learning Integration",
+        "teachingPresence": ["Live session: Portfolio guidelines, exemplar walkthrough", "Tutor office hour: Portfolio queries"],
+        "socialPresence": ["Peer triads: Share curated portfolio artefacts (async, 3-day window)"],
+        "cognitivePresence": ["Integration: Synthesis of 8-week learning", "Resolution: Curate evidence of growth"]
+      },
+      {
+        "weekNumber": 10,
+        "theme": "Final Group Presentations & Vivas",
+        "teachingPresence": ["Live session (2x, staggered): Group presentations + live Q&A", "Recorded for async viewing"],
+        "socialPresence": ["Peer assessment of group contributions", "Celebration of projects (social chat)"],
+        "cognitivePresence": ["Integration: Project design review", "Resolution: Q&A evidence of mastery"]
+      },
+      {
+        "weekNumber": 11,
+        "theme": "Capstone Synthesis",
+        "teachingPresence": ["Micro-lecture: Integrating frameworks across semester", "Office hour: Individual viva prep"],
+        "socialPresence": ["Peer viva practice (volunteer pairs, forum exchange)"],
+        "cognitivePresence": ["Resolution: Complete portfolio narratives"]
+      },
+      {
+        "weekNumber": 12,
+        "theme": "Reflection & Closure",
+        "teachingPresence": ["Portfolio vivas (individual, individual scheduling)", "Closing celebration (live session, 90 min: debrief + goodbye)"],
+        "socialPresence": ["Cohort reflection on group cohesion", "Alumni network signup"],
+        "cognitivePresence": ["Resolution: Articulate professional growth", "Meta-reflection: What next?"]
+      }
+    ]
+  },
+  "risksAndAssumptions": [
+    {
+      "id": "risk-1",
+      "risk": "Asynchronous participation: Weak engagement in forum if students feel isolated or unsupported",
+      "assumption": "Expect 60–70% student participation within first 2 weeks; may drop if tutor feedback delays >3 days",
+      "mitigation": "Tutor commitment: 48-hr max turnaround on forum posts first 4 weeks; template responses for common questions; weekly exemplar & recognition"
+    },
+    {
+      "id": "risk-2",
+      "risk": "Timezone challenges: Cohort spans 2–3 time zones (US East, UK, Europe); live sessions can't suit all",
+      "assumption": "Async video recording + interactive tools (polls, breakouts) will mitigate; retention of part-time cohorts ~80–85%",
+      "mitigation": "Rotate live session time (semester 1: 8pm UK = 3pm ET; semester 2: 7pm UK = 2pm ET); record all sessions within 24 hr; async breakout alternatives"
+    },
+    {
+      "id": "risk-3",
+      "risk": "AI content detection: Students tempted to use generative AI for essays/case-study analysis, evading authenticity",
+      "assumption": "Turnitin + live viva will catch ~90% detectable AI; peer review + rubric emphasis on 'evidence' reduces incentive",
+      "mitigation": "Rubric emphasises unique interpretation, not 'analysis'; Turnitin checks flagged submissions; viva for any >10% flagged; portfolio includes process artefacts"
+    },
+    {
+      "id": "risk-4",
+      "risk": "Group project dynamics: Free-riding or conflict in 4-person groups could torpedo engagement & fairness",
+      "assumption": "Cohort self-selects for professionalism; peer feedback + individual viva component ensures accountability; ~5% may still struggle",
+      "mitigation": "Team contract in Week 1; peer-rated contributions (weighted 20% vs 80% group grade); tutor mediation protocol; individual oral component (15 min, individual weighting)"
+    },
+    {
+      "id": "risk-5",
+      "risk": "Technical barriers: Some students may lack reliable internet, quiet workspace, or digital skills",
+      "assumption": "Part-time cohort likely has stable (mature learners), but 1–2 students may need accommodations",
+      "mitigation": "Pre-programme digital literacy audit; offer in-person support slots; asynchronous alternatives for all sync components (recorded + forum threads)"
+    },
+    {
+      "id": "risk-6",
+      "risk": "Workload creep: 10 credits assessment portfolio may feel heavy for part-time learners if tutor feedback delays accumulate",
+      "assumption": "Well-scaffolded checkpoints + auto-save features will reduce last-minute panic; part-time cohort intrinsically motivated",
+      "mitigation": "Clear rubrics & grade descriptors shared upfront; formative checkpoints every 2 weeks; feedback within 5 days; optional 1-1 check-ins mid-semester"
+    }
+  ],
+  "createdAt": "2026-02-24",
+  "lastModified": "2026-02-24"
+}

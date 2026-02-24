@@ -1,0 +1,173 @@
+{
+  "assessmentPatterns": [
+    {
+      "id": "authentic-task",
+      "name": "Authentic Task",
+      "description": "Real-world problem requiring application of knowledge",
+      "type": "project",
+      "template": {
+        "title": "Authentic Task: [Context]",
+        "type": "project",
+        "evidence": ["Deliverable artefact", "Process documentation"],
+        "authenticity": 5,
+        "aiRisk": "high",
+        "aiRiskGuidance": "Scaffold with process constraints, peer review, live viva",
+        "scaffoldSteps": [
+          "Brief with exemplars",
+          "Checkpoint 1: Plan review",
+          "Checkpoint 2: Draft feedback",
+          "Final submission with reflection"
+        ],
+        "feedbackMoments": ["Formative checkpoint 1", "Formative checkpoint 2", "Summative final"]
+      }
+    },
+    {
+      "id": "case-study-analysis",
+      "name": "Case Study Analysis",
+      "description": "Structured analysis of a real or realistic scenario",
+      "type": "essay",
+      "template": {
+        "title": "Case Study Analysis: [Context]",
+        "type": "essay",
+        "evidence": ["Written analysis (2000–3000 words)"],
+        "authenticity": 4,
+        "aiRisk": "high",
+        "aiRiskGuidance": "Require original interpretation; embed Turnitin check; randomise case studies",
+        "scaffoldSteps": [
+          "Case brief and guiding questions",
+          "Outline submission for feedback",
+          "Draft analysis review (peer or tutor)",
+          "Final submission"
+        ],
+        "feedbackMoments": ["Outline feedback", "Draft feedback (turnaround 3 days)", "Summative final"]
+      }
+    },
+    {
+      "id": "live-presentation",
+      "name": "Live Presentation & Q&A",
+      "description": "Synchronous presentation with peer/tutor questioning",
+      "type": "presentation",
+      "template": {
+        "title": "Live Presentation: [Topic]",
+        "type": "presentation",
+        "evidence": ["Presentation slides", "Oral delivery (10–15 min)", "Q&A response notes"],
+        "authenticity": 4,
+        "aiRisk": "low",
+        "aiRiskGuidance": "Synchronous live Q&A ensures authenticity; record for students unable to attend live",
+        "scaffoldSteps": [
+          "Presentation guidelines and exemplar",
+          "Slides pre-submission for format check",
+          "Live presentation with Q&A (recorded)",
+          "Optional: reflection on questions received"
+        ],
+        "feedbackMoments": ["Pre-presentation format check", "Live Q&A (formative)", "Tutor notes (summative)"]
+      }
+    },
+    {
+      "id": "portfolio",
+      "name": "Learning Portfolio",
+      "description": "Curated collection of evidence with reflective commentary",
+      "type": "portfolio",
+      "template": {
+        "title": "Learning Portfolio: [Module Topic]",
+        "type": "portfolio",
+        "evidence": ["Curated artefacts (3–5 pieces)", "Reflective narrative (1000–1500 words)"],
+        "authenticity": 4,
+        "aiRisk": "medium",
+        "aiRiskGuidance": "Require live viva or presentation of portfolio; avoid standalone written submission",
+        "scaffoldSteps": [
+          "Portfolio brief and rubric",
+          "Checkpoint: Evidence collection plan",
+          "Checkpoint: Draft reflection (tutor feedback)",
+          "Final portfolio with live viva (15 min)"
+        ],
+        "feedbackMoments": ["Plan feedback", "Draft reflection feedback", "Live viva + summative feedback"]
+      }
+    },
+    {
+      "id": "peer-review",
+      "name": "Peer Review & Critique",
+      "description": "Students assess peer work using rubric, fostering critical evaluation",
+      "type": "essay",
+      "template": {
+        "title": "Peer Review: [Assignment]",
+        "type": "essay",
+        "evidence": ["Rubric-based peer feedback (written forms)", "Reviewer's own submission"],
+        "authenticity": 3,
+        "aiRisk": "low",
+        "aiRiskGuidance": "Use structured rubric; require 2+ peer reviews minimum; tutor spot-checks quality",
+        "scaffoldSteps": [
+          "Training: Rubric walkthrough + exemplar feedback",
+          "Peer draft submissions (staggered)",
+          "Assigned peer reviews (2–3 per student)",
+          "Tutor quality check on 20% of feedback",
+          "Revision window based on peer + tutor feedback"
+        ],
+        "feedbackMoments": ["Peer feedback (formative)", "Tutor spot-check (formative)", "Summative revision"]
+      }
+    },
+    {
+      "id": "quiz-mcq",
+      "name": "Multiple Choice Quiz",
+      "description": "Automated knowledge check with instant feedback",
+      "type": "quiz",
+      "template": {
+        "title": "Knowledge Check: [Topic]",
+        "type": "quiz",
+        "evidence": ["Quiz responses (20–30 questions)", "Instant feedback on answers"],
+        "authenticity": 1,
+        "aiRisk": "low",
+        "aiRiskGuidance": "Randomise question/answer order; use only for formative check or low-stakes summative",
+        "scaffoldSteps": [
+          "Tutorial: Quiz format and example Qs",
+          "Formative practice quiz (unlimited attempts)",
+          "Summative quiz (1 attempt, 45 min time limit)"
+        ],
+        "feedbackMoments": ["Instant answer feedback", "Post-quiz debrief session"]
+      }
+    },
+    {
+      "id": "discussion-forum",
+      "name": "Online Discussion & Participation",
+      "description": "Asynchronous peer dialogue with rubric-based grading",
+      "type": "discussion",
+      "template": {
+        "title": "Discussion Forum: [Theme]",
+        "type": "discussion",
+        "evidence": ["Initial post (250–500 words)", "Substantive replies (2–3) to peers"],
+        "authenticity": 3,
+        "aiRisk": "medium",
+        "aiRiskGuidance": "Combine with quiz or poll; require evidence of critical engagement (not just agreement)",
+        "scaffoldSteps": [
+          "Forum guidelines and rubric (clarity, evidence, engagement)",
+          "Tutor model post showing depth",
+          "3-day window: initial posts",
+          "5-day window: replies",
+          "Tutor moderation & recognition of exemplars"
+        ],
+        "feedbackMoments": ["Tutor prompts (if low engagement)", "Exemplar recognition", "Grades + summary feedback"]
+      }
+    },
+    {
+      "id": "diagnostic-pretest",
+      "name": "Diagnostic Pre-test",
+      "description": "Baseline knowledge assessment to inform teaching",
+      "type": "quiz",
+      "template": {
+        "title": "Diagnostic Pre-test: [Topic]",
+        "type": "quiz",
+        "evidence": ["Responses to conceptual or skill-based items (ungraded)"],
+        "authenticity": 1,
+        "aiRisk": "low",
+        "aiRiskGuidance": "Formative only; share results with students to motivate learning",
+        "scaffoldSteps": [
+          "Pre-test delivery (Week 1, ungraded)",
+          "Show results distribution to cohort",
+          "Instruction adapted based on results",
+          "Revisit same items post-module (optional)"
+        ],
+        "feedbackMoments": ["Aggregate class feedback (anonymous)", "Personalized pre/post comparison (if repeated)"]
+      }
+    }
+  ]
+}
