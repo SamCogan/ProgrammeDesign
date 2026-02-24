@@ -239,6 +239,169 @@
       }
     ]
   },
+  "modules": [
+    {
+      "id": "mod-1",
+      "title": "Strategic Management & Analysis",
+      "credits": 10,
+      "semester": 1,
+      "learningOutcomes": [
+        {
+          "id": "lo-1-1",
+          "statement": "Apply established strategic analysis frameworks (PESTLE, Porter's 5 Forces, balanced scorecard) to evaluate organisational environments and competitive positioning",
+          "level": "Apply"
+        },
+        {
+          "id": "lo-1-2",
+          "statement": "Analyse internal and external factors influencing strategic choices, incorporating financial, ethical, and sustainability considerations",
+          "level": "Analyse"
+        },
+        {
+          "id": "lo-1-3",
+          "statement": "Synthesise strategic recommendations for complex organisational scenarios, articulated clearly to diverse stakeholders",
+          "level": "Create"
+        }
+      ],
+      "assessments": [
+        {
+          "id": "assess-mod1-1",
+          "name": "Case Study Analysis: Organisational Strategy",
+          "type": "Essay",
+          "weight": 60,
+          "description": "Analyse a real or realistic organisation using strategic frameworks. 2500 words. Includes PESTLE, competitive positioning, recommended strategic shifts, and ethical considerations.",
+          "aiRisk": "high",
+          "aiRiskDesignMitigation": "Randomised case studies; Turnitin check; live viva follow-up for >5% flagged content; peer review encourages original interpretation"
+        },
+        {
+          "id": "assess-mod1-2",
+          "name": "Strategic Framework Application Quiz",
+          "type": "Quiz",
+          "weight": 20,
+          "description": "Scenario-based quiz (timed, 45 min). Students apply frameworks to new situations in real-time. Auto-graded.",
+          "aiRisk": "low",
+          "aiRiskDesignMitigation": "Timed in-class environment; immediate grading; cannot use external tools"
+        },
+        {
+          "id": "assess-mod1-3",
+          "name": "Peer Review & Forum Participation",
+          "type": "Participation",
+          "weight": 20,
+          "description": "Weekly forum posts analysing case snippets. Minimum 300 words + substantive replies to 2 peers. Rubric emphasises critical synthesis over volume.",
+          "aiRisk": "medium",
+          "aiRiskDesignMitigation": "Rubric-based depth assessment; tutor spot-checks for AI markers; peer review of engagement quality"
+        }
+      ],
+      "udlEvidence": [
+        {
+          "dimension": "representation",
+          "sublevel": "Perception",
+          "evidence": "Module provides case studies in multiple formats: written text, video interviews with executives, infographic summaries, and interactive dashboards. Students choose preferred modality for engagement."
+        },
+        {
+          "dimension": "representation",
+          "sublevel": "Language",
+          "evidence": "Strategic terminology glossary embedded in LMS. Key concepts introduced with plain-language definitions, field examples, and visual concept maps. Weekly terminology quiz reinforces vocabulary."
+        },
+        {
+          "dimension": "actionExpression",
+          "sublevel": "Expression",
+          "evidence": "Learners can respond to assessment prompts via written essay, recorded presentation, annotated visual map, or live discussion. Choice of format available for both formative and summative."
+        },
+        {
+          "dimension": "engagement",
+          "sublevel": "Motivation",
+          "evidence": "Case studies drawn from students' own industries. Guest speakers (industry practitioners) add relevance. Peer learning cohort ensures personal connections and accountability."
+        }
+      ],
+      "learningExperience": {
+        "weeklyTemplate": {
+          "monday": "Release: Case brief + reading list; optional 'theory checkpoint' video (12 min); glossary updated",
+          "wednesdayEvening": "Live session (2hr): Framework walkthrough via live case breakout analysis; triads analyse simultaneously; tutor synthesises insights",
+          "thursday": "Forum opens: Students post initial strategic appraisal of case (250+ words). Peer replies encouraged.",
+          "friday": "Async work: Students refine draft analysis; access curated peer examples; optional office hour Q&A",
+          "weekend": "Tutor synthesis posted: Key patterns noted; exemplar contributions highlighted; preview of next week's framework"
+        }
+      }
+    },
+    {
+      "id": "mod-2",
+      "title": "Leadership, Ethics & Change",
+      "credits": 10,
+      "semester": 1,
+      "learningOutcomes": [
+        {
+          "id": "lo-2-1",
+          "statement": "Evaluate leadership approaches in light of organisational culture, stakeholder needs, and ethical principles",
+          "level": "Evaluate"
+        },
+        {
+          "id": "lo-2-2",
+          "statement": "Design and justify ethical decision-making frameworks for ambiguous organisational scenarios",
+          "level": "Create"
+        },
+        {
+          "id": "lo-2-3",
+          "statement": "Propose context-appropriate change management and stakeholder engagement strategies for team and organisational development",
+          "level": "Create"
+        }
+      ],
+      "assessments": [
+        {
+          "id": "assess-mod2-1",
+          "name": "Ethical Dilemma Response & Group Debate",
+          "type": "Project",
+          "weight": 50,
+          "description": "Individual written position (1500 words) on assigned ethical scenario + live group debate (30 min). Students argue competing ethical frameworks. Video recorded.",
+          "aiRisk": "medium",
+          "aiRiskDesignMitigation": "Live synchronous debate element prevents AI generation; individual position requires personal justification; Turnitin checks on written component"
+        },
+        {
+          "id": "assess-mod2-2",
+          "name": "Change Management Plan",
+          "type": "Project",
+          "weight": 40,
+          "description": "Small group (3 people) design a change initiative for a real org challenge. Deliverable: 3000-word plan + stakeholder analysis matrix. Individual reflection on group contribution (500 words).",
+          "aiRisk": "high",
+          "aiRiskDesignMitigation": "Peer-rated individual contributions (20% weighting); group viva (15 min); individual reflection demonstrates personal thinking"
+        },
+        {
+          "id": "assess-mod2-3",
+          "name": "Reflective Practice Journal",
+          "type": "Portfolio",
+          "weight": 10,
+          "description": "Weekly reflective entries (2-3 weeks selected) on leadership moments from practice. Ungraded; counts toward participation credit.",
+          "aiRisk": "low",
+          "aiRiskDesignMitigation": "Personal reflection on contextual experience; highly individualised; difficult to AI-generate authentically"
+        }
+      ],
+      "udlEvidence": [
+        {
+          "dimension": "representation",
+          "sublevel": "Comprehension",
+          "evidence": "Leadership theories introduced via live case discussion, then anchored to students' own organisational contexts. Prior knowledge activated through icebreaker interviews."
+        },
+        {
+          "dimension": "actionExpression",
+          "sublevel": "PhysicalAction",
+          "evidence": "Assessment options include written response, video presentation, or live spoken debate. Synchronous component accessible async via recordings."
+        },
+        {
+          "dimension": "engagement",
+          "sublevel": "Sustaining",
+          "evidence": "Peer feedback embedded throughout; group work provides social accountability; tutor recognises exemplar contributions publicly in forum"
+        }
+      ],
+      "learningExperience": {
+        "weeklyTemplate": {
+          "monday": "Release: Leadership framework overview (micro-lecture, 15 min); ethical case prompt",
+          "wednesdayEvening": "Live session (2hr): Guest speaker (senior leader) discusses real ethical challenge; breakout debates on frameworks; live Q&A",
+          "thursday": "Forum: Students post ethical position statement; peer replies challenge reasoning",
+          "friday": "Async work: Access exemplar debate transcripts; draft change plan with group members (collaborative doc)",
+          "weekend": "Tutor synthesis: Integrate ethics with strategy; flag common misconceptions; set up next week's organisational scenario"
+        }
+      }
+    }
+  ],
   "risksAndAssumptions": [
     {
       "id": "risk-1",

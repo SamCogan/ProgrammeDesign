@@ -1,0 +1,521 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/Programme",
+  "$id": "https://ncirl.ie/schemas/programme.schema.json",
+  "title": "NCI Programme Design Schema",
+  "description": "Schema for NCI Programme Design Studio programme data — auto-generated from TypeScript types",
+  "$defs": {
+    "Programme": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "awardType": {
+          "type": "string"
+        },
+        "awardTypeIsOther": {
+          "type": "boolean"
+        },
+        "nfqLevel": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "school": {
+          "type": "string"
+        },
+        "awardStandardIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "awardStandardNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "totalCredits": {
+          "type": "number"
+        },
+        "electiveDefinitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ElectiveDefinition"
+          }
+        },
+        "intakeMonths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "modules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Module"
+          }
+        },
+        "plos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PLO"
+          }
+        },
+        "ploToModules": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deprecated": "Use ploToMimlos instead. Kept for migration compatibility."
+        },
+        "ploToMimlos": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Mapping of PLO IDs to arrays of MIMLO IDs"
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProgrammeVersion"
+          }
+        },
+        "updatedAt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mode": {
+          "type": "string"
+        },
+        "moduleEditor": {
+          "type": "object",
+          "properties": {
+            "assignedModuleIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "id",
+        "title",
+        "awardType",
+        "awardTypeIsOther",
+        "nfqLevel",
+        "school",
+        "awardStandardIds",
+        "awardStandardNames",
+        "totalCredits",
+        "electiveDefinitions"
+      ]
+    },
+    "ElectiveDefinition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "credits": {
+          "type": "number"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ElectiveGroup"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "code",
+        "credits",
+        "groups"
+      ]
+    },
+    "ElectiveGroup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "moduleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "code",
+        "moduleIds"
+      ]
+    },
+    "Module": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "credits": {
+          "type": "number"
+        },
+        "isElective": {
+          "type": "boolean"
+        },
+        "stage": {
+          "type": "number"
+        },
+        "semester": {
+          "type": "number"
+        },
+        "moduleLeadName": {
+          "type": "string"
+        },
+        "moduleLeadEmail": {
+          "type": "string"
+        },
+        "mimlos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MIMLO"
+          }
+        },
+        "assessments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ModuleAssessment"
+          }
+        },
+        "effortHours": {
+          "type": "object"
+        },
+        "readingList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReadingListItem"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "code",
+        "credits"
+      ],
+      "description": "Module-related type definitions."
+    },
+    "MIMLO": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ]
+    },
+    "ModuleAssessment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "weighting": {
+          "type": "number"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "text": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "integrity": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "mimloIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string"
+        },
+        "indicativeWeek": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "ReadingListItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "citation": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "publisher": {
+          "type": "string"
+        },
+        "year": {
+          "type": "string"
+        },
+        "isbn": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "isCore": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "PLO": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "standardMappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "standardId": {
+                "type": "string"
+              },
+              "criteria": {
+                "type": "string"
+              },
+              "thread": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "criteria",
+              "thread"
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "description": "Programme Learning Outcome type definitions."
+    },
+    "ProgrammeVersion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "deliveryModality": {
+          "type": "string"
+        },
+        "targetAudience": {
+          "type": "string"
+        },
+        "deliveryPatterns": {
+          "type": "object"
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Stage"
+          }
+        },
+        "effortConfig": {
+          "type": "object"
+        },
+        "intakes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "startMonth": {
+          "type": "string"
+        },
+        "durationWeeks": {
+          "type": "number"
+        },
+        "teachingWeeks": {
+          "type": "number"
+        },
+        "admissionsDeadline": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "targetCohortSize": {
+          "type": "number"
+        },
+        "numberOfGroups": {
+          "type": "number"
+        },
+        "deliveryNotes": {
+          "type": "string"
+        },
+        "onlineProctoredExams": {
+          "type": "string"
+        },
+        "onlineProctoredExamsNotes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "code"
+      ],
+      "description": "Programme version and stage type definitions."
+    },
+    "Stage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "number"
+        },
+        "creditsTarget": {
+          "type": "number"
+        },
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "moduleId": {
+                "type": "string"
+              },
+              "semester": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "moduleId"
+            ]
+          }
+        },
+        "moduleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exitAward": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "awardTitle": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  }
+}

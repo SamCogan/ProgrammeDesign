@@ -94,23 +94,7 @@ const BLANK_STATE = {
                 weeklyRhythm: [],
                 notes: ''
             },
-            udlEvidence: {
-                representation: {
-                    defaults: [],
-                    custom: [],
-                    evidenceDesc: ''
-                },
-                actionExpression: {
-                    defaults: [],
-                    custom: [],
-                    evidenceDesc: ''
-                },
-                engagement: {
-                    defaults: [],
-                    custom: [],
-                    evidenceDesc: ''
-                }
-            }
+            udlEvidence: []
         }
     ],
     exitCapabilities: [
@@ -253,6 +237,137 @@ function downloadHandoffJSON(filename = 'programme-handoff') {
         exportedAt: new Date().toISOString()
     };
     downloadJSON(filename, handoff);
+}
+
+/**
+ * Transform studio format to QQI-compliant format
+ * Maps pedagogical design to regulatory structure
+ */
+function transformToQQI(studioState) {
+    if (!studioState.programmeTitle) {
+        throw new Error('Programme title is required');
+    }
+
+    // Auto-generate programme ID
+    const progId = studioState.id || generateId('prog');
+    
+    // Transform PLOs
+    const plos = (studioState.draftPLOs || []).map((plo, idx) => ({
+        id: plo.id,
+        code: plo.code || `PLO-${idx + 1}`,
+        text: plo.statement || plo.text || '',
+        standardMappings: plo.standardMappings || []
+    }));
+
+    // Transform modules
+    const modules = (studioState.modules || []).map((mod, modIdx) => {
+        // Create MIMLO array from learningOutcomes
+        const mimlos = (mod.learningOutcomes || []).map((lo, loIdx) => ({
+            id: lo.id,
+            text: lo.statement || lo.text || ''
+        }));
+
+        // Transform assessments
+        const assessments = (mod.assessments || []).map((assess, assIdx) => ({
+            id: assess.id,
+            type: assess.type || 'assignment',
+            title: assess.name || assess.title || '',
+            weighting: assess.weight || 0,
+            weight: assess.weight || 0,
+            text: assess.description || '',
+            mode: assess.mode || 'coursework',
+            integrity: assess.integrity || {},
+            mimloIds: [], // Will be linked in next phase if needed
+            notes: assess.aiRiskDesignMitigation || assess.notes || '',
+            indicativeWeek: assess.indicativeWeek || null
+        }));
+
+        return {
+            id: mod.id,
+            title: mod.title,
+            code: mod.code || `${studioState.programmeTitle.slice(0, 3).toUpperCase()}${modIdx + 1}`.padEnd(6, '0'),
+            credits: mod.credits || 10,
+            isElective: mod.isElective || false,
+            stage: mod.stage || Math.ceil(mod.semester / 2) || 1,
+            semester: mod.semester || 1,
+            moduleLeadName: mod.moduleLeadName || '',
+            moduleLeadEmail: mod.moduleLeadEmail || '',
+            mimlos: mimlos,
+            assessments: assessments,
+            effortHours: mod.effortHours || {},
+            readingList: mod.readingList || []
+        };
+    });
+
+    // Create QQI-compliant root object
+    const qqqData = {
+        schemaVersion: 1.0,
+        id: progId,
+        title: studioState.programmeTitle,
+        awardType: studioState.awardType || 'MSc',
+        awardTypeIsOther: studioState.awardTypeIsOther || false,
+        nfqLevel: studioState.nfqLevel || 9,
+        school: studioState.school || 'School of [Subject]',
+        awardStandardIds: studioState.awardStandardIds || [],
+        awardStandardNames: studioState.awardStandardNames || [],
+        totalCredits: studioState.credits || 90,
+        electiveDefinitions: studioState.electiveDefinitions || [],
+        intakeMonths: studioState.intakeMonths || [],
+        modules: modules,
+        plos: plos,
+        ploToMimlos: studioState.ploToMimlos || {},
+        versions: studioState.versions || [],
+        updatedAt: new Date().toISOString(),
+        mode: studioState.mode || 'design',
+        // Studio-specific extensions (preserved in export)
+        _studioMetadata: {
+            audience: studioState.audience,
+            audienceConstraints: studioState.audienceConstraints,
+            valueProposition: studioState.valueProposition,
+            capabilities: studioState.capabilities || [],
+            differentiators: studioState.differentiators || [],
+            deliveryMode: studioState.deliveryMode,
+            deliveryDuration: studioState.deliveryDuration,
+            deliveryStructure: studioState.deliveryStructure,
+            learningExperience: studioState.learningExperience,
+            risksAndAssumptions: studioState.risksAndAssumptions || [],
+            assessmentPortfolio: studioState.assessmentPortfolio || [],
+            coiPlan: studioState.coiPlan
+        }
+    };
+
+    return qqqData;
+}
+
+/**
+ * Trigger QQI format download
+ */
+function exportToQQI() {
+    try {
+        const qqqData = transformToQQI(appState);
+        const filename = `programme_qqi_${appState.programmeTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`;
+        downloadToFile(filename, qqqData);
+        showToast('✅ Programme exported to QQI format', 'success');
+    } catch (e) {
+        console.error('QQI export error:', e);
+        showToast(`❌ Export failed: ${e.message}`, 'danger');
+    }
+}
+
+/**
+ * Generic file download helper (no toast)
+ */
+function downloadToFile(filename, obj) {
+    const json = JSON.stringify(obj, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 /**
@@ -1188,188 +1303,285 @@ function showModulesManager() {
  * Show module editor modal for creating/editing a module
  */
 function showModuleEditor(moduleId = null) {
-    let module = null;
-    let isNew = false;
-
+    // Navigate to Module Studio instead of opening modal
+    document.getElementById('tabModuleStudio').click();
+    
     if (moduleId) {
-        module = appState.modules.find(m => m.id === moduleId);
+        const moduleIndex = appState.modules.findIndex(m => m.id === moduleId);
+        if (moduleIndex >= 0) {
+            renderModuleStudio();
+            // Select the specific module after render
+            setTimeout(() => {
+                document.querySelector(`[data-mod-idx="${moduleIndex}"]`)?.click();
+            }, 100);
+        }
     } else {
-        isNew = true;
-        module = {
-            id: generateId('mod'),
-            title: 'New Module',
-            credits: 10,
-            semester: 1,
-            learningOutcomes: [],
-            assessments: [],
-            learningExperience: {
-                weeklyTemplate: {
-                    monday: '',
-                    wednesdayEvening: '',
-                    thursday: '',
-                    friday: '',
-                    weekend: ''
-                },
-                cognitivePresence: []
-            },
-            udlEvidence: {
-                representation: { defaults: [], custom: [], evidenceDesc: '' },
-                actionExpression: { defaults: [], custom: [], evidenceDesc: '' },
-                engagement: { defaults: [], custom: [], evidenceDesc: '' }
-            }
-        };
+        // For new modules, add new and navigate
+        addNewModule();
+        renderModuleStudio();
     }
+}
 
-    if (!module) return;
-
-    const modalTitle = document.getElementById('moduleEditorTitle');
-    const modalBody = document.getElementById('moduleEditorBody');
-
-    modalTitle.textContent = isNew ? 'Create New Module' : `Edit Module: ${module.title}`;
-
-    modalBody.innerHTML = `
-        <ul class="nav nav-tabs mb-3" role="tablist" id="moduleEditorTabs">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="modBasicTab" data-bs-toggle="tab" data-bs-target="#modBasicContent" type="button" role="tab">
-                    📋 Basic Info
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="modOutcomesTab" data-bs-toggle="tab" data-bs-target="#modOutcomesContent" type="button" role="tab">
-                    🎯 Learning Outcomes
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="modAssessmentTab" data-bs-toggle="tab" data-bs-target="#modAssessmentContent" type="button" role="tab">
-                    ✏️ Assessments
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="modLETab" data-bs-toggle="tab" data-bs-target="#modLEContent" type="button" role="tab">
-                    🔄 Learning Experience
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="modUDLTab" data-bs-toggle="tab" data-bs-target="#modUDLContent" type="button" role="tab">
-                    ♿ UDL Evidence
-                </button>
-            </li>
-        </ul>
-
-        <!-- Basic Info Tab -->
-        <div class="tab-content" id="moduleEditorContent">
-            <div class="tab-pane fade show active" id="modBasicContent" role="tabpanel">
-                <div class="mb-3">
-                    <label class="form-label">Module Title *</label>
-                    <input type="text" id="modTitle" class="form-control" value="${escapeHtml(module.title)}" placeholder="e.g., Project Management Essentials">
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Credits *</label>
-                        <input type="number" id="modCredits" class="form-control" value="${module.credits}" min="1" max="60" placeholder="10">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Semester *</label>
-                        <input type="number" id="modSemester" class="form-control" value="${module.semester}" min="1" max="6" placeholder="1">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Learning Outcomes Tab -->
-            <div class="tab-pane fade" id="modOutcomesContent" role="tabpanel">
-                <div class="mb-3">
-                    <h6 class="mb-2">Module Learning Outcomes</h6>
-                    <div id="modOutcomesList">
-                        ${(module.learningOutcomes || []).map((lo, idx) => `
-                            <div class="mb-2 pb-2 border-bottom">
-                                <input type="text" class="form-control form-control-sm mb-1" placeholder="LO statement" value="${escapeHtml(lo.statement)}" data-lo-idx="${idx}" data-lo-field="statement">
-                                <select class="form-select form-select-sm" data-lo-idx="${idx}" data-lo-field="level">
-                                    <option value="Remember" ${lo.level === 'Remember' ? 'selected' : ''}>Remember</option>
-                                    <option value="Understand" ${lo.level === 'Understand' ? 'selected' : ''}>Understand</option>
-                                    <option value="Apply" ${lo.level === 'Apply' ? 'selected' : ''}>Apply</option>
-                                    <option value="Analyse" ${lo.level === 'Analyse' ? 'selected' : ''}>Analyse</option>
-                                    <option value="Evaluate" ${lo.level === 'Evaluate' ? 'selected' : ''}>Evaluate</option>
-                                    <option value="Create" ${lo.level === 'Create' ? 'selected' : ''}>Create</option>
-                                </select>
-                                <button type="button" class="btn btn-sm btn-outline-danger mt-1 btn-remove-lo" data-lo-idx="${idx}">Remove</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-primary mt-2 btn-add-lo">+ Add Learning Outcome</button>
-                </div>
-            </div>
-
-            <!-- Assessments Tab -->
-            <div class="tab-pane fade" id="modAssessmentContent" role="tabpanel">
-                <p class="text-muted small mb-3">In Phase 2, module assessments will be configured here. Currently, assessments are at the programme level.</p>
-                <div id="modAssessmentsList">
-                    <p class="small text-muted">${(module.assessments || []).length} assessment(s) linked to this module</p>
-                </div>
-            </div>
-
-            <!-- Learning Experience Tab -->
-            <div class="tab-pane fade" id="modLEContent" role="tabpanel">
-                <h6 class="mb-3">Weekly Teaching & Social Presence</h6>
-                ${['monday', 'wednesdayEvening', 'thursday', 'friday', 'weekend'].map(day => {
-                    const dayLabels = {
-                        monday: 'Monday',
-                        wednesdayEvening: 'Wednesday Evening',
-                        thursday: 'Thursday',
-                        friday: 'Friday',
-                        weekend: 'Weekend'
-                    };
-                    return `
-                        <div class="mb-3">
-                            <label class="form-label small">${dayLabels[day]}</label>
-                            <textarea class="form-control form-control-sm" rows="2" placeholder="e.g., Live session, Forum post" data-le-field="${day}">${escapeHtml(module.learningExperience?.weeklyTemplate?.[day] || '')}</textarea>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-
-            <!-- UDL Evidence Tab -->
-            <div class="tab-pane fade" id="modUDLContent" role="tabpanel">
-                <p class="small text-muted mb-3">Evidence of UDL implementation in Representation, Action & Expression, and Engagement.</p>
-                <div id="modUDLList">
-                    <!-- UDL evidence will be rendered here in Phase 2 -->
-                    <p class="text-muted">UDL Evidence configuration coming in Phase 2</p>
-                </div>
-            </div>
-        </div>
-    `;
-
-    const modal = new bootstrap.Modal(document.getElementById('moduleEditorModal'));
-    modal.show();
-
-    // Store module data for saving
+/**
+ * Generate module editor HTML for inline viewing
+ */
+function showModuleEditorInline(moduleIndex, module) {
+    window.currentModuleStudioIndex = moduleIndex;
     window.currentEditingModule = {
-        isNew: isNew,
+        isNew: false,
         originalModule: module,
         moduleData: { ...module }
     };
 
-    // Add event listeners for learning outcomes
-    const editorModal = document.getElementById('moduleEditorBody');
+    return `
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>${escapeHtml(module.title)}</h4>
+                <button class="btn btn-success btn-sm btn-save-module-studio">💾 Save Module</button>
+            </div>
 
-    editorModal.querySelectorAll('.btn-add-lo').forEach(btn => {
+            <ul class="nav nav-tabs mb-3" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#modStudioBasic" type="button" role="tab">
+                        📋 Basic Info
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#modStudioOutcomes" type="button" role="tab">
+                        🎯 Learning Outcomes
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#modStudioUDL" type="button" role="tab">
+                        ♿ UDL Evidence
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#modStudioAssessments" type="button" role="tab">
+                        📋 Assessments
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Basic Info Tab -->
+                <div class="tab-pane fade show active" id="modStudioBasic" role="tabpanel">
+                    <div class="mb-3">
+                        <label class="form-label">Module Title *</label>
+                        <input type="text" id="modTitle" class="form-control" value="${escapeHtml(module.title)}" placeholder="e.g., Project Management Essentials">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Credits</label>
+                            <input type="number" id="modCredits" class="form-control" value="${module.credits}" min="1" max="60">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Semester</label>
+                            <input type="number" id="modSemester" class="form-control" value="${module.semester}" min="1" max="4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Outcomes Tab -->
+                <div class="tab-pane fade" id="modStudioOutcomes" role="tabpanel">
+                    <button class="btn btn-sm btn-primary mb-3 btn-add-lo">+ Add Learning Outcome</button>
+                    <div id="modOutcomesList">
+                        ${(module.learningOutcomes || []).map((lo, idx) => `
+                            <div class="card mb-2">
+                                <div class="card-body p-2">
+                                    <input type="text" class="form-control form-control-sm mb-2" data-lo-field="statement" value="${escapeHtml(lo.statement)}" placeholder="Learning outcome statement">
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select form-select-sm" data-lo-field="level">
+                                            <option value="Remember" ${lo.level === 'Remember' ? 'selected' : ''}>Remember</option>
+                                            <option value="Understand" ${lo.level === 'Understand' ? 'selected' : ''}>Understand</option>
+                                            <option value="Apply" ${lo.level === 'Apply' ? 'selected' : ''}>Apply</option>
+                                            <option value="Analyze" ${lo.level === 'Analyze' ? 'selected' : ''}>Analyze</option>
+                                            <option value="Evaluate" ${lo.level === 'Evaluate' ? 'selected' : ''}>Evaluate</option>
+                                            <option value="Create" ${lo.level === 'Create' ? 'selected' : ''}>Create</option>
+                                        </select>
+                                        <button class="btn btn-xs btn-outline-danger btn-remove-lo" data-lo-idx="${idx}">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- UDL Evidence Tab -->
+                <div class="tab-pane fade" id="modStudioUDL" role="tabpanel">
+                    <p class="small text-muted mb-3">Select UDL sublevels and add evidence of implementation.</p>
+                    
+                    <div class="mb-4">
+                        <h6 class="mb-3">📊 Representation</h6>
+                        <div class="ms-2">
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Perception" id="rep-perception">
+                                <label class="form-check-label" for="rep-perception">Perception - Multiple modalities</label>
+                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Perception" rows="2" placeholder="Evidence..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Language" id="rep-language">
+                                <label class="form-check-label" for="rep-language">Language & Symbols - Clarify vocabulary</label>
+                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Language" rows="2" placeholder="Evidence..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Comprehension" id="rep-comprehension">
+                                <label class="form-check-label" for="rep-comprehension">Comprehension - Activate prior knowledge</label>
+                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Comprehension" rows="2" placeholder="Evidence..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="mb-3">🎯 Action & Expression</h6>
+                        <div class="ms-2">
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="PhysicalAction" id="act-physical">
+                                <label class="form-check-label" for="act-physical">Physical Action - Multiple response methods</label>
+                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-PhysicalAction" rows="2" placeholder="Evidence..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="Expression" id="act-expression">
+                                <label class="form-check-label" for="act-expression">Expression & Communication - Multiple media</label>
+                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Expression" rows="2" placeholder="Evidence..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="Executive" id="act-executive">
+                                <label class="form-check-label" for="act-executive">Executive Functions - Support planning</label>
+                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Executive" rows="2" placeholder="Evidence..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="mb-3">💡 Engagement</h6>
+                        <div class="ms-2">
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="Recruiting" id="eng-recruiting">
+                                <label class="form-check-label" for="eng-recruiting">Recruiting Attention - Emotional salience</label>
+                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-Recruiting" rows="2" placeholder="Evidence..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="Sustaining" id="eng-sustaining">
+                                <label class="form-check-label" for="eng-sustaining">Sustaining Effort - Optimize challenge</label>
+                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-Sustaining" rows="2" placeholder="Evidence..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="SelfRegulation" id="eng-selfregulation">
+                                <label class="form-check-label" for="eng-selfregulation">Self-Regulation - Clear expectations</label>
+                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-SelfRegulation" rows="2" placeholder="Evidence..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assessments Tab -->
+                <div class="tab-pane fade" id="modStudioAssessments" role="tabpanel">
+                    <button class="btn btn-sm btn-primary mb-3 btn-add-studio-assessment">+ Add Assessment</button>
+                    <div id="modStudioAssessmentsList">
+                        ${module.assessments && module.assessments.length > 0 ? module.assessments.map((assess, idx) => `
+                            <div class="card mb-2 border-light">
+                                <div class="card-body py-2 px-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div style="flex: 1; font-size: 0.9rem;">
+                                            <strong>${escapeHtml(assess.name || 'Untitled')}</strong><br>
+                                            <small class="text-muted">Type: ${assess.type || '—'} | Weight: ${assess.weight || '—'}%</small><br>
+                                            ${assess.description ? `<small>${escapeHtml(assess.description)}</small>` : ''}
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-xs btn-outline-primary me-1 btn-edit-studio-assessment" data-assess-idx="${idx}">✏️</button>
+                                            <button class="btn btn-xs btn-outline-danger btn-delete-studio-assessment" data-assess-idx="${idx}">🗑️</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('') : '<div class="text-muted small"><em>No assessments yet</em></div>'}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Attach event handlers for Module Studio
+ */
+function attachModuleStudioHandlers(moduleIndex) {
+    const detailsContainer = document.getElementById('moduleStudioDetails');
+    if (!detailsContainer) return;
+
+    // Save module button
+    detailsContainer.querySelector('.btn-save-module-studio')?.addEventListener('click', () => {
+        saveModuleFromEditor();
+        renderModuleStudio();
+    });
+
+    // Add learning outcome
+    detailsContainer.querySelectorAll('.btn-add-lo').forEach(btn => {
         btn.addEventListener('click', () => {
-            const outcomesList = editorModal.querySelector('#modOutcomesList');
             const newLO = { id: generateId('modlo'), statement: 'New learning outcome', level: 'Apply' };
             if (!window.currentEditingModule.moduleData.learningOutcomes) {
                 window.currentEditingModule.moduleData.learningOutcomes = [];
             }
             window.currentEditingModule.moduleData.learningOutcomes.push(newLO);
-            showModuleEditor(window.currentEditingModule.originalModule.id);
+            renderModuleStudioDetails(moduleIndex);
+            attachModuleStudioHandlers(moduleIndex);
         });
     });
 
-    editorModal.querySelectorAll('.btn-remove-lo').forEach(btn => {
+    // Remove learning outcome
+    detailsContainer.querySelectorAll('.btn-remove-lo').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const loIdx = parseInt(e.target.dataset.loIdx);
             window.currentEditingModule.moduleData.learningOutcomes.splice(loIdx, 1);
-            showModuleEditor(window.currentEditingModule.original.id);
+            renderModuleStudioDetails(moduleIndex);
+            attachModuleStudioHandlers(moduleIndex);
         });
     });
+
+    // Add assessment
+    detailsContainer.querySelector('.btn-add-studio-assessment')?.addEventListener('click', () => {
+        if (!window.currentEditingModule.moduleData.assessments) {
+            window.currentEditingModule.moduleData.assessments = [];
+        }
+        const newAssessment = { id: generateId('assess'), name: 'New Assessment', type: 'Assignment', weight: 0, description: '' };
+        window.currentEditingModule.moduleData.assessments.push(newAssessment);
+        renderModuleStudioDetails(moduleIndex);
+        attachModuleStudioHandlers(moduleIndex);
+    });
+
+    // Edit assessment
+    detailsContainer.querySelectorAll('.btn-edit-studio-assessment').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const assessIdx = parseInt(e.target.dataset.assessIdx);
+            const assessment = window.currentEditingModule.moduleData.assessments[assessIdx];
+            if (assessment) {
+                showAssessmentModal(assessIdx, assessment);
+            }
+        });
+    });
+
+    // Delete assessment
+    detailsContainer.querySelectorAll('.btn-delete-studio-assessment').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const assessIdx = parseInt(e.target.dataset.assessIdx);
+            if (confirm('Delete this assessment?')) {
+                window.currentEditingModule.moduleData.assessments.splice(assessIdx, 1);
+                renderModuleStudioDetails(moduleIndex);
+                attachModuleStudioHandlers(moduleIndex);
+            }
+        });
+    });
+
+    // Populate UDL Evidence
+    if (window.currentEditingModule.moduleData.udlEvidence && Array.isArray(window.currentEditingModule.moduleData.udlEvidence)) {
+        window.currentEditingModule.moduleData.udlEvidence.forEach(item => {
+            const checkbox = detailsContainer.querySelector(`.udl-sublevel[data-udl-dim="${item.dimension}"][value="${item.sublevel}"]`);
+            const textarea = detailsContainer.querySelector(`[data-udl-sublevel="${item.dimension}-${item.sublevel}"]`);
+            if (checkbox) checkbox.checked = true;
+            if (textarea) textarea.value = item.evidence;
+        });
+    }
 }
 
 /**
@@ -1392,17 +1604,110 @@ function addNewModule() {
             weeklyRhythm: [],
             notes: ''
         },
-        udlEvidence: {
-            representation: { defaults: [], custom: [], evidenceDesc: '' },
-            actionExpression: { defaults: [], custom: [], evidenceDesc: '' },
-            engagement: { defaults: [], custom: [], evidenceDesc: '' }
-        }
+        udlEvidence: []
     };
 
     appState.modules.push(newModule);
     saveToLocalStorage();
     showToast('Module created. Click Edit to configure details.', 'success');
     showModuleEditor(newModule.id);
+}
+
+/**
+ * Show assessment editor modal for module
+ */
+function showAssessmentModal(assessmentIndex, assessment) {
+    const assessmentTypes = ['Assignment', 'Exam', 'Project', 'Presentation', 'Quiz', 'Portfolio', 'Practical', 'Participation', 'Other'];
+    
+    const html = `
+        <div class="modal fade" id="assessmentModuleModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Assessment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Assessment Name *</label>
+                            <input type="text" id="assessName" class="form-control" value="${escapeHtml(assessment.name)}" placeholder="e.g., Final Project">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Assessment Type</label>
+                            <select id="assessType" class="form-select">
+                                ${assessmentTypes.map(type => `<option value="${type}" ${assessment.type === type ? 'selected' : ''}>${type}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Weight (%) *</label>
+                            <input type="number" id="assessWeight" class="form-control" value="${assessment.weight || 0}" min="0" max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea id="assessDesc" class="form-control" rows="3" placeholder="Assessment details...">${escapeHtml(assessment.description || '')}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">🤖 AI Risk Level</label>
+                            <select id="assessAiRisk" class="form-select">
+                                <option value="low" ${(assessment.aiRisk || 'medium') === 'low' ? 'selected' : ''}>Low</option>
+                                <option value="medium" ${(assessment.aiRisk || 'medium') === 'medium' ? 'selected' : ''}>Medium</option>
+                                <option value="high" ${(assessment.aiRisk || 'medium') === 'high' ? 'selected' : ''}>High</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">🤖 AI Risk Design Mitigation</label>
+                            <textarea id="assessAiMitigation" class="form-control" rows="3" placeholder="Describe how AI risks are mitigated in this assessment design...">${escapeHtml(assessment.aiRiskDesignMitigation || '')}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="saveModuleAssessment(${assessmentIndex})">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remove existing modal if present
+    const existingModal = document.getElementById('assessmentModuleModal');
+    if (existingModal) existingModal.remove();
+    
+    document.body.insertAdjacentHTML('beforeend', html);
+    const modal = new bootstrap.Modal(document.getElementById('assessmentModuleModal'));
+    modal.show();
+}
+
+/**
+ * Save module assessment
+ */
+function saveModuleAssessment(assessmentIndex) {
+    const name = document.getElementById('assessName')?.value.trim();
+    const type = document.getElementById('assessType')?.value;
+    const weight = parseInt(document.getElementById('assessWeight')?.value) || 0;
+    const description = document.getElementById('assessDesc')?.value.trim();
+    const aiRisk = document.getElementById('assessAiRisk')?.value;
+    const aiRiskDesignMitigation = document.getElementById('assessAiMitigation')?.value.trim();
+
+    if (!name) {
+        showToast('Assessment name is required', 'danger');
+        return;
+    }
+
+    if (window.currentEditingModule?.moduleData?.assessments?.[assessmentIndex]) {
+        window.currentEditingModule.moduleData.assessments[assessmentIndex] = {
+            ...window.currentEditingModule.moduleData.assessments[assessmentIndex],
+            name,
+            type,
+            weight,
+            description,
+            aiRisk,
+            aiRiskDesignMitigation
+        };
+    }
+
+    bootstrap.Modal.getInstance(document.getElementById('assessmentModuleModal'))?.hide();
+    showModuleEditor(window.currentEditingModule.originalModule.id);
+    showToast('Assessment saved', 'success');
 }
 
 /**
@@ -1456,6 +1761,22 @@ function saveModuleFromEditor() {
         cognitivePresence: originalModule.learningExperience?.cognitivePresence || []
     };
 
+    // Collect UDL Evidence
+    const udlEvidence = [];
+    document.querySelectorAll('.udl-sublevel:checked').forEach(checkbox => {
+        const dimension = checkbox.dataset.udlDim;
+        const sublevel = checkbox.value;
+        const evidenceKey = `${dimension}-${sublevel}`;
+        const evidenceText = document.querySelector(`[data-udl-sublevel="${evidenceKey}"]`)?.value || '';
+        if (evidenceText.trim()) {
+            udlEvidence.push({
+                dimension,
+                sublevel,
+                evidence: evidenceText.trim()
+            });
+        }
+    });
+
     // Update or create module
     if (isNew) {
         const newModule = {
@@ -1464,9 +1785,9 @@ function saveModuleFromEditor() {
             credits,
             semester,
             learningOutcomes,
-            assessments: [],
+            assessments: window.currentEditingModule.moduleData.assessments || [],
             learningExperience,
-            udlEvidence: originalModule.udlEvidence
+            udlEvidence
         };
         appState.modules.push(newModule);
     } else {
@@ -1476,7 +1797,9 @@ function saveModuleFromEditor() {
             moduleToUpdate.credits = credits;
             moduleToUpdate.semester = semester;
             moduleToUpdate.learningOutcomes = learningOutcomes;
+            moduleToUpdate.assessments = window.currentEditingModule.moduleData.assessments || [];
             moduleToUpdate.learningExperience = learningExperience;
+            moduleToUpdate.udlEvidence = udlEvidence;
         }
     }
 
@@ -1890,13 +2213,13 @@ function renderProgrammeEvidenceList() {
     let html = '';
     
     (appState.exitCapabilities || []).forEach(cap => {
+        html += `
+            <div class="mb-4">
+                <h6 class="text-primary font-weight-bold">${escapeHtml(cap.text)}</h6>
+                <div class="ms-3">
+        `;
+        
         if (cap.evidence && cap.evidence.length > 0) {
-            html += `
-                <div class="mb-4">
-                    <h6 class="text-primary font-weight-bold">${escapeHtml(cap.text)}</h6>
-                    <div class="ms-3">
-            `;
-            
             cap.evidence.forEach(ev => {
                 html += `
                     <div class="card card-sm mb-2 border-light">
@@ -1919,19 +2242,21 @@ function renderProgrammeEvidenceList() {
                     </div>
                 `;
             });
-            
-            html += `
-                    </div>
+        } else {
+            html += '<div class="text-muted small"><em>No evidence added yet</em></div>';
+        }
+        
+        html += `
                     <button class="btn btn-sm btn-outline-success mb-3 btn-add-evidence" data-cap-id="${cap.id}">
                         + Add Evidence
                     </button>
                 </div>
-            `;
-        }
+            </div>
+        `;
     });
 
     if (html === '') {
-        return '<div class="alert alert-secondary">No evidence added yet. Add an exit capability, then add evidence to it.</div>';
+        return '<div class="alert alert-secondary">No exit capabilities defined yet. Add an exit capability first, then add evidence to it.</div>';
     }
 
     return html;
@@ -2017,6 +2342,88 @@ function renderProgrammePerformanceSummary() {
         </div>
     `;
 }
+
+// ===== MODULE STUDIO TAB =====
+/**
+ * Render Module Studio with module list and details
+ */
+function renderModuleStudio() {
+    const listContainer = document.getElementById('moduleStudioList');
+    const detailsContainer = document.getElementById('moduleStudioDetails');
+    const countBadge = document.getElementById('modulesCountBadge');
+    
+    if (!listContainer || !detailsContainer) return;
+
+    const moduleCount = (appState.modules || []).length;
+    
+    // Debug: log module count
+    console.log(`renderModuleStudio: ${moduleCount} modules loaded`);
+    
+    // Update count badge
+    if (countBadge) {
+        countBadge.textContent = `${moduleCount} module${moduleCount !== 1 ? 's' : ''}`;
+    }
+
+    // Render module list
+    let listHtml = '<div class="d-flex flex-column gap-3">';
+    (appState.modules || []).forEach((module, idx) => {
+        console.log(`  Module ${idx}: ${module.title}`);
+        listHtml += `
+            <div class="card p-3 cursor-pointer module-list-item border-2" data-mod-idx="${idx}" style="cursor: pointer; min-height: 80px; display: flex; flex-direction: column; justify-content: center;">
+                <strong class="small" style="font-size: 0.95rem;">${escapeHtml(module.title)}</strong>
+                <small class="text-muted">📚 ${module.credits} credits | Semester ${module.semester}</small>
+                <small class="text-muted">Assessments: ${(module.assessments || []).length}</small>
+            </div>
+        `;
+    });
+    listHtml += '</div>';
+    listContainer.innerHTML = listHtml;
+
+    // Add click listeners to module items
+    listContainer.querySelectorAll('.module-list-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const modIdx = parseInt(item.dataset.modIdx);
+            renderModuleStudioDetails(modIdx);
+        });
+    });
+
+    // Add Module button
+    document.getElementById('btnAddNewModule')?.addEventListener('click', () => {
+        addNewModule();
+        renderModuleStudio();
+    });
+
+    // Show details for first module if exists
+    if (appState.modules && appState.modules.length > 0) {
+        renderModuleStudioDetails(0);
+    } else {
+        detailsContainer.innerHTML = '<p class="text-muted">No modules yet. Click "Add Module" to create one.</p>';
+    }
+}
+
+/**
+ * Render module details in Module Studio
+ */
+function renderModuleStudioDetails(moduleIndex) {
+    const detailsContainer = document.getElementById('moduleStudioDetails');
+    if (!detailsContainer) return;
+
+    const module = appState.modules[moduleIndex];
+    if (!module) {
+        detailsContainer.innerHTML = '<p class="text-muted">Module not found</p>';
+        return;
+    }
+
+    detailsContainer.innerHTML = showModuleEditorInline(moduleIndex, module);
+    
+    // Attach event handlers
+    attachModuleStudioHandlers(moduleIndex);
+}
+
+/**
+ * Store currently selected module index
+ */
+window.currentModuleStudioIndex = 0;
 
 // ===== ONLINE EXPERIENCE (COI) TAB =====
 // ===== LEARNING EXPERIENCE TAB =====
@@ -2847,13 +3254,23 @@ function renderExport() {
 
 // ===== BACKWARD DESIGN CRUD =====
 function showAddExitCapabilityModal() {
-    document.getElementById('exitCapabilityModalTitle').textContent = 'Add Exit Capability';
-    document.getElementById('exitCapabilityText').value = '';
+    const titleEl = document.getElementById('exitCapabilityModalTitle');
+    const textEl = document.getElementById('exitCapabilityText');
+    const customTagEl = document.getElementById('customTag');
+    const modalEl = document.getElementById('exitCapabilityModal');
+    
+    if (!titleEl || !textEl || !customTagEl || !modalEl) {
+        console.error('Exit capability modal elements not found');
+        return;
+    }
+    
+    titleEl.textContent = 'Add Exit Capability';
+    textEl.value = '';
     document.querySelectorAll('.capability-tag-checkbox').forEach(cb => cb.checked = false);
-    document.getElementById('customTag').value = '';
+    customTagEl.value = '';
     window.currentEditingCapabilityId = null;
     
-    const modal = new bootstrap.Modal(document.getElementById('exitCapabilityModal'));
+    const modal = new bootstrap.Modal(modalEl);
     modal.show();
 }
 
@@ -2861,8 +3278,17 @@ function showEditExitCapabilityModal(capabilityId) {
     const capability = appState.exitCapabilities.find(c => c.id === capabilityId);
     if (!capability) return;
 
-    document.getElementById('exitCapabilityModalTitle').textContent = 'Edit Exit Capability';
-    document.getElementById('exitCapabilityText').value = capability.text;
+    const titleEl = document.getElementById('exitCapabilityModalTitle');
+    const textEl = document.getElementById('exitCapabilityText');
+    const modalEl = document.getElementById('exitCapabilityModal');
+    
+    if (!titleEl || !textEl || !modalEl) {
+        console.error('Exit capability modal elements not found');
+        return;
+    }
+
+    titleEl.textContent = 'Edit Exit Capability';
+    textEl.value = capability.text;
     
     document.querySelectorAll('.capability-tag-checkbox').forEach(cb => {
         cb.checked = (capability.tags || []).includes(cb.value);
@@ -2870,12 +3296,18 @@ function showEditExitCapabilityModal(capabilityId) {
     
     window.currentEditingCapabilityId = capabilityId;
     
-    const modal = new bootstrap.Modal(document.getElementById('exitCapabilityModal'));
+    const modal = new bootstrap.Modal(modalEl);
     modal.show();
 }
 
 function saveExitCapability() {
-    const text = document.getElementById('exitCapabilityText').value.trim();
+    const textEl = document.getElementById('exitCapabilityText');
+    if (!textEl) {
+        console.error('exitCapabilityText element not found');
+        return;
+    }
+    
+    const text = textEl.value.trim();
     if (!text) {
         showToast('Capability statement cannot be empty', 'danger');
         return;
@@ -2900,7 +3332,11 @@ function saveExitCapability() {
     }
 
     saveToLocalStorage();
-    bootstrap.Modal.getInstance(document.getElementById('exitCapabilityModal')).hide();
+    const modalEl = document.getElementById('exitCapabilityModal');
+    if (modalEl) {
+        const instance = bootstrap.Modal.getInstance(modalEl);
+        if (instance) instance.hide();
+    }
     renderBackwardDesign();
     showToast('Exit capability saved', 'success');
 }
@@ -3077,7 +3513,7 @@ function renderAllTabs() {
     renderCanvas();
     renderBackwardDesign();
     renderAlignmentMap();
-    renderAssessmentStudio();
+    renderModuleStudio();
     renderLearningExperience();
     renderRoadmap();
     renderExport();
@@ -3105,6 +3541,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btnExport')?.addEventListener('click', () => {
         new bootstrap.Modal(document.getElementById('exportModal')).show();
     });
+
+    document.getElementById('btnExportQQI')?.addEventListener('click', exportToQQI);
 
     document.getElementById('btnDownloadFull')?.addEventListener('click', downloadFullJSON);
     document.getElementById('btnDownloadHandoff')?.addEventListener('click', downloadHandoffJSON);

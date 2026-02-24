@@ -28,6 +28,9 @@
                         <button class="btn btn-sm btn-success me-2" id="btnExport" title="Export current work">
                             📥 Export
                         </button>
+                        <button class="btn btn-sm btn-info me-2" id="btnExportQQI" title="Export to QQI format">
+                            🎓 Export to QQI
+                        </button>
                         <button class="btn btn-sm btn-warning me-2" id="btnReset" title="Reset to blank">
                             🔄 Reset
                         </button>
@@ -52,8 +55,8 @@
                     <button class="nav-link" id="tabAlignment" data-bs-toggle="pill" data-bs-target="#contentAlignment" type="button" role="tab">
                         🔗 Alignment Map
                     </button>
-                    <button class="nav-link" id="tabAssessment" data-bs-toggle="pill" data-bs-target="#contentAssessment" type="button" role="tab">
-                        ✏️ Assessment Studio
+                    <button class="nav-link" id="tabModuleStudio" data-bs-toggle="pill" data-bs-target="#contentModuleStudio" type="button" role="tab">
+                        📚 Module Studio
                     </button>
                     <button class="nav-link" id="tabCOI" data-bs-toggle="pill" data-bs-target="#contentCOI" type="button" role="tab">
                         🌊 Learning Experience
@@ -115,24 +118,27 @@
                         </div>
                     </div>
 
-                    <!-- ASSESSMENT STUDIO TAB -->
-                    <div class="tab-pane fade" id="contentAssessment" role="tabpanel">
-                        <h2 class="mb-3">Assessment Studio: Backward Design</h2>
-                        <div class="row">
-                            <div class="col-md-9">
-                                <div id="assessmentList">
-                                    <!-- Assessment cards will be rendered here -->
+                    <!-- MODULE STUDIO TAB -->
+                    <div class="tab-pane fade" id="contentModuleStudio" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h2 class="mb-0 d-inline-block">Module Studio</h2>
+                                <span class="badge bg-info ms-2" id="modulesCountBadge">0 modules</span>
+                            </div>
+                            <button class="btn btn-primary" id="btnAddNewModule">
+                                + Add Module
+                            </button>
+                        </div>
+                        <div class="row" style="height: calc(100vh - 200px);">
+                            <!-- Modules List Sidebar -->
+                            <div class="col-md-3 border-end overflow-y-auto" style="height: 100%;">
+                                <div id="moduleStudioList">
+                                    <!-- Module list will be populated here -->
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">Assessment Patterns</h5>
-                                    </div>
-                                    <div class="card-body small" id="patternLibrary">
-                                        <!-- Patterns will be populated here -->
-                                    </div>
-                                </div>
+                            <!-- Module Details Area -->
+                            <div class="col-md-9 overflow-y-auto" style="height: 100%;" id="moduleStudioDetails">
+                                <p class="text-muted">Select a module to view details</p>
                             </div>
                         </div>
                     </div>
@@ -309,6 +315,9 @@
                                 <input class="form-check-input capability-tag-checkbox" type="checkbox" id="tag-Digital" value="Digital">
                                 <label class="form-check-label" for="tag-Digital">Digital</label>
                             </div>
+                        </div>
+                        <div class="mt-2">
+                            <input type="text" class="form-control form-control-sm" id="customTag" placeholder="Add custom tag (press Enter)">
                         </div>
                     </div>
                 </div>
