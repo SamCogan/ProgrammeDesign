@@ -568,6 +568,21 @@ document.addEventListener('click', (e) => {
         deleteExitCapability(capId);
     }
 
+    // Backward Design - PLOs (Programme Learning Outcomes)
+    if (e.target.classList.contains('btn-add-plo')) {
+        showAddPLOModal();
+    }
+
+    if (e.target.classList.contains('btn-edit-plo')) {
+        const ploId = e.target.dataset.id;
+        showEditPLOModal(ploId);
+    }
+
+    if (e.target.classList.contains('btn-delete-plo')) {
+        const ploId = e.target.dataset.id;
+        deletePLO(ploId);
+    }
+
     // Backward Design - Evidence
     if (e.target.classList.contains('btn-add-evidence')) {
         const capId = e.target.dataset.capId;
@@ -620,10 +635,14 @@ document.addEventListener('click', (e) => {
         window.currentEvidenceId = null;
         
         document.getElementById('assessmentEvidenceModalTitle').textContent = 'Add Assessment Evidence';
+        document.getElementById('evidenceAssessmentLink').value = '';
         document.getElementById('evidenceDescription').value = '';
         document.getElementById('simulatedPerformance').value = '';
         document.getElementById('assessmentAiRisk').value = 'medium';
         document.getElementById('evidenceScaffold').value = '';
+        
+        // Populate assessment options
+        populateAssessmentOptions(moduleId);
         
         const modal = new bootstrap.Modal(document.getElementById('assessmentEvidenceModal'));
         modal.show();
@@ -640,10 +659,14 @@ document.addEventListener('click', (e) => {
                 window.currentEvidenceId = evId;
                 
                 document.getElementById('assessmentEvidenceModalTitle').textContent = 'Edit Assessment Evidence';
+                document.getElementById('evidenceAssessmentLink').value = evidence.linkedAssessmentId || '';
                 document.getElementById('evidenceDescription').value = evidence.description;
                 document.getElementById('simulatedPerformance').value = evidence.simulatedPerformance;
                 document.getElementById('assessmentAiRisk').value = evidence.aiRisk;
                 document.getElementById('evidenceScaffold').value = (evidence.scaffoldSteps || []).join(', ');
+                
+                // Populate assessment options
+                populateAssessmentOptions(moduleId);
                 
                 const modal = new bootstrap.Modal(document.getElementById('assessmentEvidenceModal'));
                 modal.show();
@@ -1841,6 +1864,11 @@ function renderBackwardDesign() {
                 ${renderModuleLevelBackwardDesign()}
             </div>
         </div>
+
+        <!-- Modals -->
+        ${renderPLOModal()}
+        ${renderAssessmentEvidenceModal()}
+        ${renderLearningActivityModal()}
     `;
 
     // Add event listeners for score sliders
@@ -2044,6 +2072,43 @@ function renderModuleBackwardDesignWarnings(module) {
     return warnings.length > 0 ? warnings.join('') : '<div class="alert alert-success"><small>✓ Module backward design looks good</small></div>';
 }
 
+function renderPLOModal() {
+    return `
+        <div class="modal fade" id="ploModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ploModalTitle">Add Programme Learning Outcome</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label"><strong>PLO Statement</strong></label>
+                            <textarea class="form-control" id="ploStatement" rows="3" placeholder="e.g., Demonstrate knowledge of contemporary strategic management theories and their application"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Bloom's Level</strong></label>
+                            <select class="form-select" id="ploLevel">
+                                <option value="Remember">Remember</option>
+                                <option value="Understand">Understand</option>
+                                <option value="Apply">Apply</option>
+                                <option value="Analyse">Analyse</option>
+                                <option value="Evaluate">Evaluate</option>
+                                <option value="Create">Create</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="savePLO()">Save PLO</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function renderAssessmentEvidenceModal() {
     return `
         <div class="modal fade" id="assessmentEvidenceModal" tabindex="-1">
@@ -2054,6 +2119,14 @@ function renderAssessmentEvidenceModal() {
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Link to Module Assessment (Optional)</strong></label>
+                            <select class="form-select" id="evidenceAssessmentLink">
+                                <option value="">-- Manual Entry (No Assessment Link) --</option>
+                            </select>
+                            <small class="form-text text-muted">Select an assessment or leave blank to enter custom evidence</small>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label"><strong>What must learners produce?</strong></label>
                             <textarea class="form-control" id="evidenceDescription" rows="2" placeholder="e.g., A 5000-word strategic analysis report"></textarea>
@@ -2149,8 +2222,28 @@ function renderProgrammeLevelBackwardDesign() {
                 </div>
             </div>
 
-            <!-- SECTION 2: PROGRAMME EVIDENCE -->
+            <!-- SECTION 2: PROGRAMME LEARNING OUTCOMES (PLOs) -->
             <div class="col-lg-6 mb-4">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">📚 Programme Learning Outcomes (PLOs)</h5>
+                        <small>Mapped from exit capabilities to module outcomes</small>
+                    </div>
+                    <div class="card-body">
+                        ${renderProgrammeLearningOutcomesList()}
+                    </div>
+                    <div class="card-footer bg-light">
+                        <button class="btn btn-sm btn-info btn-add-plo">
+                            + Add PLO
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <!-- SECTION 3: PROGRAMME EVIDENCE -->
+            <div class="col-lg-12 mb-4">
                 <div class="card border-success">
                     <div class="card-header bg-success text-white">
                         <h5 class="mb-0">📋 Programme Evidence</h5>
@@ -2163,7 +2256,7 @@ function renderProgrammeLevelBackwardDesign() {
             </div>
         </div>
 
-        <!-- SECTION 3: PROGRAMME PERFORMANCE SUMMARY -->
+        <!-- SECTION 4: PROGRAMME PERFORMANCE SUMMARY -->
         <div class="row mt-4">
             <div class="col-12">
                 ${renderProgrammePerformanceSummary()}
@@ -2200,6 +2293,35 @@ function renderExitCapabilitiesList() {
                             ✏️
                         </button>
                         <button class="btn btn-sm btn-outline-danger btn-delete-exit-capability" data-id="${cap.id}">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderProgrammeLearningOutcomesList() {
+    if (!appState.draftPLOs || appState.draftPLOs.length === 0) {
+        return '<div class="alert alert-secondary">No PLOs defined yet.</div>';
+    }
+
+    return appState.draftPLOs.map(plo => `
+        <div class="card mb-3 border-light">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div style="flex: 1;">
+                        <p class="mb-1"><strong>${escapeHtml(plo.statement)}</strong></p>
+                        <small class="text-muted">
+                            <span class="badge bg-secondary">${plo.level || 'Apply'}</span>
+                        </small>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-1 btn-edit-plo" data-id="${plo.id}">
+                            ✏️
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger btn-delete-plo" data-id="${plo.id}">
                             🗑️
                         </button>
                     </div>
@@ -3350,6 +3472,99 @@ function deleteExitCapability(capabilityId) {
     }
 }
 
+function showAddPLOModal() {
+    const titleEl = document.getElementById('ploModalTitle');
+    const statementEl = document.getElementById('ploStatement');
+    const levelEl = document.getElementById('ploLevel');
+    const modalEl = document.getElementById('ploModal');
+    
+    if (!titleEl || !statementEl || !levelEl || !modalEl) {
+        console.error('PLO modal elements not found');
+        return;
+    }
+    
+    titleEl.textContent = 'Add Programme Learning Outcome';
+    statementEl.value = '';
+    levelEl.value = 'Apply';
+    window.currentEditingPLOId = null;
+    
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+function showEditPLOModal(ploId) {
+    const plo = appState.draftPLOs.find(p => p.id === ploId);
+    if (!plo) return;
+
+    const titleEl = document.getElementById('ploModalTitle');
+    const statementEl = document.getElementById('ploStatement');
+    const levelEl = document.getElementById('ploLevel');
+    const modalEl = document.getElementById('ploModal');
+    
+    if (!titleEl || !statementEl || !levelEl || !modalEl) {
+        console.error('PLO modal elements not found');
+        return;
+    }
+
+    titleEl.textContent = 'Edit Programme Learning Outcome';
+    statementEl.value = plo.statement;
+    levelEl.value = plo.level || 'Apply';
+    window.currentEditingPLOId = ploId;
+    
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+function savePLO() {
+    const statementEl = document.getElementById('ploStatement');
+    const levelEl = document.getElementById('ploLevel');
+    
+    if (!statementEl || !levelEl) {
+        console.error('PLO form elements not found');
+        return;
+    }
+    
+    const statement = statementEl.value.trim();
+    const level = levelEl.value;
+    
+    if (!statement) {
+        showToast('PLO statement cannot be empty', 'danger');
+        return;
+    }
+
+    if (window.currentEditingPLOId) {
+        const plo = appState.draftPLOs.find(p => p.id === window.currentEditingPLOId);
+        if (plo) {
+            plo.statement = statement;
+            plo.level = level;
+        }
+    } else {
+        appState.draftPLOs.push({
+            id: generateId('plo'),
+            statement,
+            level
+        });
+    }
+
+    saveToLocalStorage();
+    const modalEl = document.getElementById('ploModal');
+    if (modalEl) {
+        const instance = bootstrap.Modal.getInstance(modalEl);
+        if (instance) instance.hide();
+    }
+    renderBackwardDesign();
+    showToast('PLO saved', 'success');
+}
+
+function deletePLO(ploId) {
+    if (confirm('Delete this Programme Learning Outcome?')) {
+        appState.draftPLOs = appState.draftPLOs.filter(p => p.id !== ploId);
+        saveToLocalStorage();
+        renderBackwardDesign();
+        showToast('PLO deleted', 'info');
+    }
+}
+
 function showAddEvidenceModal(capabilityId) {
     window.currentEvidenceCapabilityId = capabilityId;
     window.currentEvidenceId = null;
@@ -3437,18 +3652,33 @@ function deleteEvidence(capabilityId, evidenceId) {
 // ===== PHASE 2B: MODULE-LEVEL BACKWARD DESIGN CRUD =====
 
 function saveModuleAssessmentEvidence() {
-    const description = document.getElementById('evidenceDescription').value.trim();
-    const simulatedPerformance = document.getElementById('simulatedPerformance').value.trim();
-    const aiRisk = document.getElementById('assessmentAiRisk').value;
-    const scaffoldSteps = document.getElementById('evidenceScaffold').value.trim().split(',').map(s => s.trim()).filter(s => s);
+    const module = appState.modules.find(m => m.id === window.currentModuleId);
+    if (!module) return;
 
-    if (!description || !simulatedPerformance) {
-        showToast('Please fill in all required fields', 'danger');
+    const assessmentLink = document.getElementById('evidenceAssessmentLink').value;
+    let description = document.getElementById('evidenceDescription').value.trim();
+    let simulatedPerformance = document.getElementById('simulatedPerformance').value.trim();
+    
+    // If an assessment is linked, use its details if description is empty
+    if (assessmentLink) {
+        const linkedAssessment = module.assessments.find(a => a.id === assessmentLink);
+        if (linkedAssessment) {
+            if (!description) {
+                description = `${linkedAssessment.name} (${linkedAssessment.type}) - Weight: ${linkedAssessment.weight}%`;
+            }
+            if (!simulatedPerformance) {
+                simulatedPerformance = linkedAssessment.description || `Performance demonstrated through ${linkedAssessment.type}`;
+            }
+        }
+    }
+
+    if (!description) {
+        showToast('Please fill in assessment description', 'danger');
         return;
     }
 
-    const module = appState.modules.find(m => m.id === window.currentModuleId);
-    if (!module) return;
+    const aiRisk = document.getElementById('assessmentAiRisk').value;
+    const scaffoldSteps = document.getElementById('evidenceScaffold').value.trim().split(',').map(s => s.trim()).filter(s => s);
 
     if (!module.assessmentEvidence) module.assessmentEvidence = [];
 
@@ -3457,7 +3687,8 @@ function saveModuleAssessmentEvidence() {
         description,
         simulatedPerformance,
         aiRisk,
-        scaffoldSteps
+        scaffoldSteps,
+        linkedAssessmentId: assessmentLink || null
     };
 
     if (window.currentEvidenceId) {
@@ -3471,6 +3702,34 @@ function saveModuleAssessmentEvidence() {
     bootstrap.Modal.getInstance(document.getElementById('assessmentEvidenceModal')).hide();
     document.getElementById('moduleDetailContent').innerHTML = renderModuleBackwardDesignDetail(window.currentModuleId);
     showToast('Assessment evidence saved', 'success');
+}
+
+function populateAssessmentOptions(moduleId) {
+    const module = appState.modules.find(m => m.id === moduleId);
+    const selectEl = document.getElementById('evidenceAssessmentLink');
+    
+    if (!selectEl) return;
+    
+    // Clear existing options except the first one
+    while (selectEl.options.length > 1) {
+        selectEl.remove(1);
+    }
+    
+    if (!module || !module.assessments || module.assessments.length === 0) {
+        const option = document.createElement('option');
+        option.disabled = true;
+        option.textContent = 'No assessments in this module';
+        selectEl.appendChild(option);
+        return;
+    }
+    
+    // Add assessment options
+    module.assessments.forEach(assessment => {
+        const option = document.createElement('option');
+        option.value = assessment.id;
+        option.textContent = `${assessment.name} (${assessment.type}) - ${assessment.weight}%`;
+        selectEl.appendChild(option);
+    });
 }
 
 function saveModuleLearningActivity() {
