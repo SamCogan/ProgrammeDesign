@@ -3629,6 +3629,20 @@ function renderRoadmap() {
         </div>
 
         <div class="roadmap-section">
+            <h3>♿ UDL Guidelines: Coverage Intensity Heat Map</h3>
+            <p class="text-muted small">Intensity visualization showing how comprehensively each UDL guideline is addressed across your programme. <span style="color: #dc3545;">Red</span> = Gaps | <span style="color: #ffc107;">Yellow</span> = Partial | <span style="color: #28a745;">Green</span> = Strong coverage</p>
+            
+            ${renderUDLIntensityHeatmap()}
+        </div>
+
+        <div class="roadmap-section">
+            <h3>🎯 Community of Inquiry (CoI): Cognitive Presence Heat Map</h3>
+            <p class="text-muted small">Intensity visualization showing how well each stage of the inquiry cycle is supported across your programme. The four-stage cycle: <strong>Trigger Event → Exploration → Integration → Resolution</strong></p>
+            
+            ${renderCOIIntensityHeatmap()}
+        </div>
+
+        <div class="roadmap-section">
             <h3>Key Differentiators</h3>
             <ul class="roadmap-list">
                 ${appState.differentiators.map(d => `<li>${escapeHtml(d)}</li>`).join('')}
@@ -3737,6 +3751,107 @@ function renderUDLHeatmap() {
                     const totalEvidence = mod.udlEvidence?.filter(e => e.evidence)?.length || 0;
                     return `<li>${escapeHtml(mod.title)}: <strong>${totalEvidence}/9</strong> UDL guidelines addressed</li>`;
                 }).join('')}
+            </ul>
+        </div>
+    `;
+
+    return html;
+}
+
+/**
+ * Render UDL Intensity heatmap - shows coverage density for each UDL subcategory
+ */
+function renderUDLIntensityHeatmap() {
+    if (!appState.modules || appState.modules.length === 0) {
+        return '<p class="text-muted"><em>No modules yet. Add modules to see UDL coverage intensity.</em></p>';
+    }
+
+    const udlCategories = [
+        { dimension: 'representation', sublevel: 'Perception', label: '👁️ Perception' },
+        { dimension: 'representation', sublevel: 'Language', label: '🔤 Language & Symbols' },
+        { dimension: 'representation', sublevel: 'Comprehension', label: '🧠 Comprehension' },
+        { dimension: 'actionExpression', sublevel: 'PhysicalAction', label: '🖱️ Physical Action' },
+        { dimension: 'actionExpression', sublevel: 'Expression', label: '🗣️ Expression' },
+        { dimension: 'actionExpression', sublevel: 'Executive', label: '⚙️ Executive Functions' },
+        { dimension: 'engagement', sublevel: 'Recruiting', label: '🎪 Recruiting Attention' },
+        { dimension: 'engagement', sublevel: 'Sustaining', label: '💪 Sustaining Effort' },
+        { dimension: 'engagement', sublevel: 'SelfRegulation', label: '⚖️ Self-Regulation' }
+    ];
+
+    let html = `<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">`;
+
+    udlCategories.forEach((cat, idx) => {
+        const coverage = appState.modules.filter(mod => 
+            mod.udlEvidence?.find(e => e.dimension === cat.dimension && e.sublevel === cat.sublevel && e.evidence)
+        ).length;
+
+        const coveragePercent = (coverage / appState.modules.length) * 100;
+        let heatColor;
+        if (coveragePercent === 0) heatColor = '#dc3545'; // Red
+        else if (coveragePercent < 33) heatColor = '#fd7e14'; // Orange
+        else if (coveragePercent < 67) heatColor = '#ffc107'; // Yellow
+        else heatColor = '#28a745'; // Green
+
+        html += `
+            <div style="flex: 0 0 calc(25% - 0.75rem); min-width: 160px; padding: 1rem; border-radius: 8px; background-color: ${heatColor}20; border: 2px solid ${heatColor}; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">${cat.label}</div>
+                <div style="font-size: 2rem; font-weight: bold; color: ${heatColor}; margin-bottom: 0.5rem;">${coverage}/${appState.modules.length}</div>
+                <div style="font-size: 0.85rem; color: #555;">
+                    <strong>${Math.round(coveragePercent)}%</strong> covered<br>
+                    <small>${appState.modules.length - coverage} module${appState.modules.length - coverage !== 1 ? 's' : ''} need coverage</small>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    return html;
+}
+
+/**
+ * Render CoI (Community of Inquiry) Intensity heatmap - shows cognitive presence coverage
+ */
+function renderCOIIntensityHeatmap() {
+    const coiPhases = [
+        { key: 'trigger', label: '🎯 Trigger Event', description: 'Stimulating student curiosity' },
+        { key: 'exploration', label: '🔍 Exploration', description: 'Divergent thinking and idea generation' },
+        { key: 'integration', label: '🔗 Integration', description: 'Convergent thinking and synthesis' },
+        { key: 'resolution', label: '✅ Resolution', description: 'Application and confirmation' }
+    ];
+
+    let html = `<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">`;
+
+    coiPhases.forEach(phase => {
+        // Check programme-level availability of cognitive presence
+        const available = appState.learningExperience?.availablePresence?.cognitive?.includes(phase.key);
+        
+        // Count modules that might use this (simplified: if selected at programme level, assume potential)
+        const availability = available ? 'Available ✓' : 'Not Selected';
+        const heatColor = available ? '#28a745' : '#dc3545';
+        const bgOpacity = available ? '20' : '20';
+
+        html += `
+            <div style="flex: 0 0 calc(25% - 0.75rem); min-width: 180px; padding: 1rem; border-radius: 8px; background-color: ${heatColor}${bgOpacity}; border: 2px solid ${heatColor}; text-align: center;">
+                <div style="font-size: 1.2rem; margin-bottom: 0.5rem;"><strong>${phase.label}</strong></div>
+                <div style="font-size: 0.9rem; color: #555; margin-bottom: 0.75rem;">${phase.description}</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: ${heatColor}; padding: 0.75rem; background-color: white; border-radius: 4px; border: 1px solid ${heatColor};">
+                    ${available ? '✓ Active' : '✗ Inactive'}
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    
+    html += `
+        <div style="margin-top: 1.5rem; padding: 1rem; background-color: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
+            <p><strong>💡 About Community of Inquiry (CoI):</strong></p>
+            <p>The inquiry cycle model shows how students progress through meaningful learning. Configure which phases are available in your <strong>Programme Design → Learning Experience → Cognitive Presence</strong> section.</p>
+            <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0; font-size: 0.85rem;">
+                <li><strong>Trigger:</strong> How you initiate learning (motivating questions, scenarios)</li>
+                <li><strong>Exploration:</strong> How students brainstorm and investigate</li>
+                <li><strong>Integration:</strong> How students consolidate and synthesize ideas</li>
+                <li><strong>Resolution:</strong> How students apply and confirm learning</li>
             </ul>
         </div>
     `;
