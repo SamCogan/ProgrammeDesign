@@ -74,6 +74,7 @@ const BLANK_STATE = {
     risksAndAssumptions: [
         {
             id: 'risk-1',
+            category: 'Academic',
             risk: 'Risk statement',
             assumption: 'Related assumption',
             mitigation: 'Mitigation strategy'
@@ -532,6 +533,7 @@ document.addEventListener('click', (e) => {
     if (e.target.classList.contains('btn-add-risk')) {
         const newRisk = {
             id: generateId('risk'),
+            category: 'Academic',
             risk: 'Risk statement',
             assumption: 'Assumption',
             mitigation: 'Mitigation'
@@ -764,7 +766,7 @@ document.addEventListener('change', (e) => {
 
     // Input for canvas fields
     if (e.target.name === 'differentiator' || e.target.name === 'plo-statement' || e.target.name === 'plo-level' ||
-        e.target.name === 'riskStatement' || e.target.name === 'riskAssumption' || e.target.name === 'riskMitigation') {
+        e.target.name === 'riskStatement' || e.target.name === 'riskAssumption' || e.target.name === 'riskMitigation' || e.target.name === 'riskCategory') {
         handleCanvasFieldChange(e.target);
     }
 });
@@ -918,14 +920,31 @@ function renderCanvasTile(tileId) {
                 <div class="canvas-tile-icon">⚠️</div>
                 <div class="canvas-tile-title">Risks & Assumptions</div>
                 <div class="canvas-tile-content">
-                    ${appState.risksAndAssumptions.map((risk) => `
-                        <div class="mb-2 pb-2 border-bottom">
-                            <input type="text" name="riskStatement" class="form-control form-control-sm mb-1" placeholder="Risk" value="${escapeHtml(risk.risk)}" data-id="${risk.id}" data-field="risk">
-                            <input type="text" name="riskAssumption" class="form-control form-control-sm mb-1" placeholder="Assumption" value="${escapeHtml(risk.assumption)}" data-id="${risk.id}" data-field="assumption">
-                            <textarea name="riskMitigation" class="form-control form-control-sm" rows="2" placeholder="Mitigation" data-id="${risk.id}" data-field="mitigation">${escapeHtml(risk.mitigation)}</textarea>
-                            <button type="button" class="btn btn-sm btn-outline-danger mt-1 btn-remove-risk" data-id="${risk.id}">Remove</button>
-                        </div>
-                    `).join('')}
+                    ${appState.risksAndAssumptions.map((risk) => {
+                        const categoryColors = {
+                            'Academic': 'bg-warning',
+                            'Operational': 'bg-info',
+                            'Market': 'bg-danger',
+                            'Other': 'bg-secondary'
+                        };
+                        const borderColor = categoryColors[risk.category] || 'bg-secondary';
+                        return `
+                            <div class="mb-3 pb-3 border-bottom" style="border-left: 4px solid var(--bs-${borderColor === 'bg-warning' ? 'warning' : borderColor === 'bg-info' ? 'info' : borderColor === 'bg-danger' ? 'danger' : 'secondary'}-color); padding-left: 12px;">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <select name="riskCategory" class="form-select form-select-sm" style="width: 140px;" data-id="${risk.id}" data-field="category">
+                                        <option value="Academic" ${risk.category === 'Academic' ? 'selected' : ''}>Academic Risk</option>
+                                        <option value="Operational" ${risk.category === 'Operational' ? 'selected' : ''}>Operational Risk</option>
+                                        <option value="Market" ${risk.category === 'Market' ? 'selected' : ''}>Market Risk</option>
+                                        <option value="Other" ${risk.category === 'Other' ? 'selected' : ''}>Other</option>
+                                    </select>
+                                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-risk" data-id="${risk.id}">🗑️ Remove</button>
+                                </div>
+                                <input type="text" name="riskStatement" class="form-control form-control-sm mb-2" placeholder="Risk" value="${escapeHtml(risk.risk)}" data-id="${risk.id}" data-field="risk">
+                                <input type="text" name="riskAssumption" class="form-control form-control-sm mb-2" placeholder="Assumption" value="${escapeHtml(risk.assumption)}" data-id="${risk.id}" data-field="assumption">
+                                <textarea name="riskMitigation" class="form-control form-control-sm" rows="2" placeholder="Mitigation" data-id="${risk.id}" data-field="mitigation">${escapeHtml(risk.mitigation)}</textarea>
+                            </div>
+                        `;
+                    }).join('')}
                     <button type="button" class="btn btn-sm btn-outline-primary mt-2 btn-add-risk">+ Add Risk</button>
                 </div>
             `;
@@ -973,6 +992,9 @@ function handleCanvasFieldChange(input) {
     } else if (input.name === 'riskMitigation') {
         const risk = appState.risksAndAssumptions.find(r => r.id === id);
         if (risk) risk.mitigation = value;
+    } else if (input.name === 'riskCategory') {
+        const risk = appState.risksAndAssumptions.find(r => r.id === id);
+        if (risk) risk.category = value;
     }
 
     saveToLocalStorage();
@@ -1432,67 +1454,92 @@ function showModuleEditorInline(moduleIndex, module) {
 
                 <!-- UDL Evidence Tab -->
                 <div class="tab-pane fade" id="modStudioUDL" role="tabpanel">
-                    <p class="small text-muted mb-3">Select UDL sublevels and add evidence of implementation.</p>
+                    <div class="alert alert-info mb-4">
+                        <small>
+                            ♿ <strong>Optional:</strong> Add evidence of Universal Design for Learning (UDL) accessibility features. 
+                            This helps ensure your module is accessible to diverse learners.
+                        </small>
+                    </div>
                     
-                    <div class="mb-4">
-                        <h6 class="mb-3">📊 Representation</h6>
-                        <div class="ms-2">
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Perception" id="rep-perception">
-                                <label class="form-check-label" for="rep-perception">Perception - Multiple modalities</label>
-                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Perception" rows="2" placeholder="Evidence..."></textarea>
-                            </div>
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Language" id="rep-language">
-                                <label class="form-check-label" for="rep-language">Language & Symbols - Clarify vocabulary</label>
-                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Language" rows="2" placeholder="Evidence..."></textarea>
-                            </div>
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Comprehension" id="rep-comprehension">
-                                <label class="form-check-label" for="rep-comprehension">Comprehension - Activate prior knowledge</label>
-                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Comprehension" rows="2" placeholder="Evidence..."></textarea>
-                            </div>
+                    <div id="udlSection">
+                        <div class="d-flex align-items-center mb-3">
+                            <button class="btn btn-sm btn-outline-secondary btn-toggle-udl-evidence" >
+                                ▼ Hide UDL Evidence Details
+                            </button>
+                            <span class="ms-3 badge bg-light text-dark">📊 <span class="udl-evidence-summary-count">0</span>/9 UDL areas addressed</span>
                         </div>
-                    </div>
+                        
+                        <div class="udl-evidence-details">
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-2 cursor-pointer btn-toggle-udl-dimension" data-dimension="representation">
+                                    <span class="toggle-icon" style="cursor: pointer; min-width: 20px;">▼</span>
+                                    <span style="cursor: pointer;">📊 Representation</span>
+                                </div>
+                                <div class="ms-2 udl-dimension-items" data-dimension="representation">
+                                    <div class="mb-2">
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Perception" id="rep-perception">
+                                        <label class="form-check-label" for="rep-perception">Perception - Multiple modalities</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Perception" rows="2" placeholder="Evidence..."></textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Language" id="rep-language">
+                                        <label class="form-check-label" for="rep-language">Language & Symbols - Clarify vocabulary</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Language" rows="2" placeholder="Evidence..."></textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Comprehension" id="rep-comprehension">
+                                        <label class="form-check-label" for="rep-comprehension">Comprehension - Activate prior knowledge</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Comprehension" rows="2" placeholder="Evidence..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class="mb-4">
-                        <h6 class="mb-3">🎯 Action & Expression</h6>
-                        <div class="ms-2">
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="PhysicalAction" id="act-physical">
-                                <label class="form-check-label" for="act-physical">Physical Action - Multiple response methods</label>
-                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-PhysicalAction" rows="2" placeholder="Evidence..."></textarea>
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-2 cursor-pointer btn-toggle-udl-dimension" data-dimension="actionExpression">
+                                    <span class="toggle-icon" style="cursor: pointer; min-width: 20px;">▼</span>
+                                    <span style="cursor: pointer;">🎯 Action & Expression</span>
+                                </div>
+                                <div class="ms-2 udl-dimension-items" data-dimension="actionExpression">
+                                    <div class="mb-2">
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="PhysicalAction" id="act-physical">
+                                        <label class="form-check-label" for="act-physical">Physical Action - Multiple response methods</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-PhysicalAction" rows="2" placeholder="Evidence..."></textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="Expression" id="act-expression">
+                                        <label class="form-check-label" for="act-expression">Expression & Communication - Multiple media</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Expression" rows="2" placeholder="Evidence..."></textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="Executive" id="act-executive">
+                                        <label class="form-check-label" for="act-executive">Executive Functions - Support planning</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Executive" rows="2" placeholder="Evidence..."></textarea>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="Expression" id="act-expression">
-                                <label class="form-check-label" for="act-expression">Expression & Communication - Multiple media</label>
-                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Expression" rows="2" placeholder="Evidence..."></textarea>
-                            </div>
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="Executive" id="act-executive">
-                                <label class="form-check-label" for="act-executive">Executive Functions - Support planning</label>
-                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Executive" rows="2" placeholder="Evidence..."></textarea>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="mb-4">
-                        <h6 class="mb-3">💡 Engagement</h6>
-                        <div class="ms-2">
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="Recruiting" id="eng-recruiting">
-                                <label class="form-check-label" for="eng-recruiting">Recruiting Attention - Emotional salience</label>
-                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-Recruiting" rows="2" placeholder="Evidence..."></textarea>
-                            </div>
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="Sustaining" id="eng-sustaining">
-                                <label class="form-check-label" for="eng-sustaining">Sustaining Effort - Optimize challenge</label>
-                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-Sustaining" rows="2" placeholder="Evidence..."></textarea>
-                            </div>
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="SelfRegulation" id="eng-selfregulation">
-                                <label class="form-check-label" for="eng-selfregulation">Self-Regulation - Clear expectations</label>
-                                <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-SelfRegulation" rows="2" placeholder="Evidence..."></textarea>
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-2 cursor-pointer btn-toggle-udl-dimension" data-dimension="engagement">
+                                    <span class="toggle-icon" style="cursor: pointer; min-width: 20px;">▼</span>
+                                    <span style="cursor: pointer;">💡 Engagement</span>
+                                </div>
+                                <div class="ms-2 udl-dimension-items" data-dimension="engagement">
+                                    <div class="mb-2">
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="Recruiting" id="eng-recruiting">
+                                        <label class="form-check-label" for="eng-recruiting">Recruiting Attention - Emotional salience</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-Recruiting" rows="2" placeholder="Evidence..."></textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="Sustaining" id="eng-sustaining">
+                                        <label class="form-check-label" for="eng-sustaining">Sustaining Effort - Optimize challenge</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-Sustaining" rows="2" placeholder="Evidence..."></textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="SelfRegulation" id="eng-selfregulation">
+                                        <label class="form-check-label" for="eng-selfregulation">Self-Regulation - Clear expectations</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-SelfRegulation" rows="2" placeholder="Evidence..."></textarea>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1604,6 +1651,118 @@ function attachModuleStudioHandlers(moduleIndex) {
             if (checkbox) checkbox.checked = true;
             if (textarea) textarea.value = item.evidence;
         });
+    }
+
+    // UDL Evidence main toggle button
+    const udlToggleBtn = detailsContainer.querySelector('.btn-toggle-udl-evidence');
+    if (udlToggleBtn) {
+        udlToggleBtn.addEventListener('click', function() {
+            const detailsSection = detailsContainer.querySelector('.udl-evidence-details');
+            if (detailsSection) {
+                detailsSection.classList.toggle('d-none');
+                this.textContent = detailsSection.classList.contains('d-none') ? '▶️ Show UDL Evidence Details' : '▼ Hide UDL Evidence Details';
+            }
+        });
+    }
+
+    // UDL Dimension toggle buttons
+    detailsContainer.querySelectorAll('.btn-toggle-udl-dimension').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const dimension = this.dataset.dimension;
+            const dimensionItems = detailsContainer.querySelector(`.udl-dimension-items[data-dimension="${dimension}"]`);
+            if (dimensionItems) {
+                const isHidden = dimensionItems.classList.contains('d-none');
+                dimensionItems.classList.toggle('d-none');
+                // Update button text
+                const icon = this.querySelector('.toggle-icon');
+                if (icon) {
+                    icon.textContent = isHidden ? '▼' : '▶️';
+                }
+            }
+        });
+    });
+
+    // UDL Evidence checkboxes
+    detailsContainer.querySelectorAll('.udl-sublevel').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const dimension = this.dataset.udlDim;
+            const sublevel = this.value;
+            const evidence = detailsContainer.querySelector(`[data-udl-sublevel="${dimension}-${sublevel}"]`)?.value || '';
+            
+            // Update appState
+            if (!window.currentEditingModule.moduleData.udlEvidence) {
+                window.currentEditingModule.moduleData.udlEvidence = [];
+            }
+            
+            if (this.checked) {
+                // Add or update
+                const existing = window.currentEditingModule.moduleData.udlEvidence.find(
+                    item => item.dimension === dimension && item.sublevel === sublevel
+                );
+                if (!existing) {
+                    window.currentEditingModule.moduleData.udlEvidence.push({
+                        dimension,
+                        sublevel,
+                        evidence
+                    });
+                }
+            } else {
+                // Remove
+                window.currentEditingModule.moduleData.udlEvidence = window.currentEditingModule.moduleData.udlEvidence.filter(
+                    item => !(item.dimension === dimension && item.sublevel === sublevel)
+                );
+            }
+            
+            // Update summary count
+            updateUDLEvidenceSummary(moduleIndex);
+        });
+    });
+
+    // UDL Evidence textareas
+    detailsContainer.querySelectorAll('[data-udl-sublevel]').forEach(textarea => {
+        textarea.addEventListener('change', function() {
+            const match = this.dataset.udlSublevel.match(/(.+)-(.+)/);
+            if (match) {
+                const dimension = match[1];
+                const sublevel = match[2];
+                const evidence = this.value;
+                
+                if (!window.currentEditingModule.moduleData.udlEvidence) {
+                    window.currentEditingModule.moduleData.udlEvidence = [];
+                }
+                
+                // Update or add
+                let item = window.currentEditingModule.moduleData.udlEvidence.find(
+                    it => it.dimension === dimension && it.sublevel === sublevel
+                );
+                if (item) {
+                    item.evidence = evidence;
+                } else if (evidence) {
+                    // Only add if evidence is not empty
+                    const checkbox = detailsContainer.querySelector(`.udl-sublevel[data-udl-dim="${dimension}"][value="${sublevel}"]`);
+                    if (checkbox && checkbox.checked) {
+                        window.currentEditingModule.moduleData.udlEvidence.push({
+                            dimension,
+                            sublevel,
+                            evidence
+                        });
+                    }
+                }
+            }
+        });
+    });
+}
+
+/**
+ * Update UDL Evidence summary count
+ */
+function updateUDLEvidenceSummary(moduleIndex) {
+    const detailsContainer = document.getElementById('moduleStudioDetails');
+    const summaryElement = detailsContainer?.querySelector('.udl-evidence-summary-count');
+    
+    if (summaryElement && window.currentEditingModule?.moduleData?.udlEvidence) {
+        const count = window.currentEditingModule.moduleData.udlEvidence.filter(item => item.evidence).length;
+        summaryElement.textContent = count;
     }
 }
 
@@ -2287,6 +2446,10 @@ function renderExitCapabilitiesList() {
                             📊 ${cap.evidence?.length || 0} evidence item${(cap.evidence?.length || 0) !== 1 ? 's' : ''}
                             ${(cap.evidence?.length || 0) === 0 ? `<br><span class="text-danger">⚠️ Not evidenced at programme level</span>` : ''}
                         </small>
+                        <br>
+                        <button class="btn btn-sm btn-success btn-add-evidence mt-2" data-cap-id="${cap.id}" style="font-size: 0.85rem;">
+                            + Add Evidence
+                        </button>
                     </div>
                     <div>
                         <button class="btn btn-sm btn-outline-primary me-1 btn-edit-exit-capability" data-id="${cap.id}">
