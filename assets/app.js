@@ -844,9 +844,10 @@ function renderCanvasTile(tileId) {
                 <div class="canvas-tile-icon">⭐</div>
                 <div class="canvas-tile-title">Differentiators</div>
                 <div class="canvas-tile-content">
+                    <p class="small text-muted mb-3">🎯 <strong>What makes this programme unique?</strong><br><span class="text-secondary">Examples: industry-focused, AI-integrated, experiential, global perspective</span></p>
                     ${appState.differentiators.map((diff, idx) => `
                         <div class="mb-2 input-group input-group-sm">
-                            <input type="text" name="differentiator" class="form-control" placeholder="Differentiator" value="${escapeHtml(diff)}" data-index="${idx}">
+                            <input type="text" name="differentiator" class="form-control" placeholder="e.g., Hands-on, industry-led capstone" value="${escapeHtml(diff)}" data-index="${idx}">
                             <button class="btn btn-outline-danger btn-remove-diff" type="button" data-index="${idx}">✕</button>
                         </div>
                     `).join('')}
@@ -907,9 +908,8 @@ function renderCanvasTile(tileId) {
                 <div class="canvas-tile-icon">🔄</div>
                 <div class="canvas-tile-title">Learning Experience</div>
                 <div class="canvas-tile-content">
-                    <label class="form-label small">Weekly Rhythm Description:</label>
-                    <textarea class="form-control form-control-sm" rows="4" placeholder="e.g. Apply-Discuss-Produce-Feedback" data-field="learningExperienceDesc">${escapeHtml(appState.learningExperience?.description || '')}</textarea>
-                    <p class="small text-muted mt-2">Configure rhythm and presence types in the Learning Experience tab.</p>
+                    <p class="small text-muted mb-2">Configure teaching presence, social presence, and cognitive presence in the Learning Experience tab.</p>
+                    <p class="small text-muted">Use the presence palette to operationalize your programme's weekly rhythm.</p>
                 </div>
             `;
 
@@ -986,7 +986,7 @@ function renderAlignmentMap() {
     // Build table headers
     let html = '<thead><tr><th style="width: 30%;">Outcomes (PLOs)</th>';
     appState.assessmentPortfolio.forEach(a => {
-        html += `<th style="width: ${Math.floor(70 / appState.assessmentPortfolio.length)}%;">${escapeHtml(a.title.substring(0, 15))}</th>`;
+        html += `<th style="width: ${Math.floor(70 / appState.assessmentPortfolio.length)}%; max-width: 200px; word-wrap: break-word;" title="${escapeHtml(a.title)}"><span style="font-size: 0.85rem;">${escapeHtml(a.title.length > 25 ? a.title.substring(0, 22) + '...' : a.title)}</span></th>`;
     });
     html += '</tr></thead><tbody>';
 
@@ -1940,10 +1940,10 @@ function renderModuleBackwardDesignDetail(moduleId) {
                 <!-- STEP 1: MODULE CONTRIBUTION -->
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="text-primary">📍 Step 1: Module Contribution</h6>
+                        <h6 class="text-primary">☑️ Step 1: Link Module to Exit Capabilities</h6>
                         <span class="badge bg-info">${module.supportsExitCapabilities?.length || 0} linked</span>
                     </div>
-                    <p class="small text-muted mb-3">Which Exit Capabilities does this module support?</p>
+                    <p class="small text-muted mb-3"><strong>Instruction:</strong> Check which exit capabilities this module helps develop. This ensures alignment between module design and programme outcomes.</p>
                     
                     <div id="capabilityCheckboxes" class="bg-light p-3 rounded mb-3">
                         ${appState.exitCapabilities && appState.exitCapabilities.length > 0 ? `
