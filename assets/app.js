@@ -62,6 +62,19 @@ const BLANK_STATE = {
             feedbackMoments: ['Formative', 'Summative']
         }
     ],
+    deliveryProfile: {
+        deliveryMode: 50,
+        syncAsync: 50,
+        totalEffortHours: 1500,
+        contactHours: {
+            lectures: 0,
+            tutorials: 0,
+            labs: 0,
+            seminars: 0,
+            workshops: 0,
+            other: 0
+        }
+    },
     learningExperience: {
         description: 'High-level learning rhythm',
         availablePresence: {
@@ -122,6 +135,7 @@ function loadFromLocalStorage() {
     if (stored) {
         try {
             appState = JSON.parse(stored);
+            appState = migrateUDLGuidelines(appState);
             console.log('Loaded from localStorage');
         } catch (e) {
             console.error('Failed to parse localStorage:', e);
@@ -171,9 +185,41 @@ async function loadPatterns() {
 }
 
 /**
+ * Migrate UDL evidence from Guidelines 2.2 to 3.0
+ * Maps old sublevel names to new ones
+ */
+function migrateUDLGuidelines(state) {
+    if (!state.modules) return state;
+    
+    const migrationMap = {
+        'Comprehension': 'BuildingKnowledge',
+        'PhysicalAction': 'Interaction',
+        'Executive': 'StrategyDevelopment',
+        'Recruiting': 'WelcomingIdentities',
+        'Sustaining': 'SustainingPersistence',
+        'SelfRegulation': 'EmotionalCapacity'
+    };
+    
+    state.modules.forEach(mod => {
+        if (mod.udlEvidence && Array.isArray(mod.udlEvidence)) {
+            mod.udlEvidence = mod.udlEvidence.map(item => {
+                if (migrationMap[item.sublevel]) {
+                    console.log(`Migrated UDL: ${item.sublevel} → ${migrationMap[item.sublevel]}`);
+                    return { ...item, sublevel: migrationMap[item.sublevel] };
+                }
+                return item;
+            });
+        }
+    });
+    
+    return state;
+}
+
+/**
  * Load entire state object
  */
 function loadState(stateObj) {
+    stateObj = migrateUDLGuidelines(stateObj);
     appState = { ...BLANK_STATE, ...stateObj };
     appState.lastModified = new Date().toISOString();
     saveToLocalStorage();
@@ -1462,8 +1508,8 @@ function showModuleEditorInline(moduleIndex, module) {
                 <div class="tab-pane fade" id="modStudioUDL" role="tabpanel">
                     <div class="alert alert-info mb-4">
                         <small>
-                            ♿ <strong>Optional:</strong> Add evidence of Universal Design for Learning (UDL) accessibility features. 
-                            This helps ensure your module is accessible to diverse learners.
+                            ♿ <strong>Optional:</strong> Add evidence of Universal Design for Learning (UDL Guidelines 3.0) implementation. 
+                            This helps ensure your module supports learner agency and addresses barriers rooted in biases and exclusion.
                         </small>
                     </div>
                     
@@ -1472,7 +1518,7 @@ function showModuleEditorInline(moduleIndex, module) {
                             <button class="btn btn-sm btn-outline-secondary btn-toggle-udl-evidence" >
                                 ▼ Hide UDL Evidence Details
                             </button>
-                            <span class="ms-3 badge bg-light text-dark">📊 <span class="udl-evidence-summary-count">0</span>/9 UDL areas addressed</span>
+                            <span class="ms-3 badge bg-light text-dark">📊 <span class="udl-evidence-summary-count">0</span>/9 UDL Guidelines 3.0 addressed</span>
                         </div>
                         
                         <div class="udl-evidence-details">
@@ -1484,18 +1530,18 @@ function showModuleEditorInline(moduleIndex, module) {
                                 <div class="ms-2 udl-dimension-items" data-dimension="representation">
                                     <div class="mb-2">
                                         <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Perception" id="rep-perception">
-                                        <label class="form-check-label" for="rep-perception">Perception - Multiple modalities</label>
-                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Perception" rows="2" placeholder="Evidence..."></textarea>
+                                        <label class="form-check-label" for="rep-perception">Guideline 1: Perception - Support multiple ways to perceive information</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Perception" rows="2" placeholder="Evidence: e.g., customizable display, multiple modalities (text, audio, visual)..."></textarea>
                                     </div>
                                     <div class="mb-2">
                                         <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Language" id="rep-language">
-                                        <label class="form-check-label" for="rep-language">Language & Symbols - Clarify vocabulary</label>
-                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Language" rows="2" placeholder="Evidence..."></textarea>
+                                        <label class="form-check-label" for="rep-language">Guideline 2: Language & Symbols - Clarify vocabulary and address biases</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Language" rows="2" placeholder="Evidence: e.g., clear definitions, multiple representations, accessible notation..."></textarea>
                                     </div>
                                     <div class="mb-2">
-                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="Comprehension" id="rep-comprehension">
-                                        <label class="form-check-label" for="rep-comprehension">Comprehension - Activate prior knowledge</label>
-                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-Comprehension" rows="2" placeholder="Evidence..."></textarea>
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="representation" value="BuildingKnowledge" id="rep-building-knowledge">
+                                        <label class="form-check-label" for="rep-building-knowledge">Guideline 3: Building Knowledge - Cultivate multiple ways of knowing</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="representation-BuildingKnowledge" rows="2" placeholder="Evidence: e.g., connect prior knowledge, highlight patterns, maximize transfer..."></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1507,19 +1553,19 @@ function showModuleEditorInline(moduleIndex, module) {
                                 </div>
                                 <div class="ms-2 udl-dimension-items" data-dimension="actionExpression">
                                     <div class="mb-2">
-                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="PhysicalAction" id="act-physical">
-                                        <label class="form-check-label" for="act-physical">Physical Action - Multiple response methods</label>
-                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-PhysicalAction" rows="2" placeholder="Evidence..."></textarea>
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="Interaction" id="act-interaction">
+                                        <label class="form-check-label" for="act-interaction">Guideline 4: Interaction - Vary methods for response, navigation, and movement</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Interaction" rows="2" placeholder="Evidence: e.g., keyboard navigation, multiple input methods, accessible technology..."></textarea>
                                     </div>
                                     <div class="mb-2">
                                         <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="Expression" id="act-expression">
-                                        <label class="form-check-label" for="act-expression">Expression & Communication - Multiple media</label>
-                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Expression" rows="2" placeholder="Evidence..."></textarea>
+                                        <label class="form-check-label" for="act-expression">Guideline 5: Expression & Communication - Use multiple media and tools</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Expression" rows="2" placeholder="Evidence: e.g., multiple formats for output, diverse communication modes, graduated support..."></textarea>
                                     </div>
                                     <div class="mb-2">
-                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="Executive" id="act-executive">
-                                        <label class="form-check-label" for="act-executive">Executive Functions - Support planning</label>
-                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-Executive" rows="2" placeholder="Evidence..."></textarea>
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="actionExpression" value="StrategyDevelopment" id="act-strategy">
+                                        <label class="form-check-label" for="act-strategy">Guideline 6: Strategy Development - Set goals and anticipate challenges</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="actionExpression-StrategyDevelopment" rows="2" placeholder="Evidence: e.g., goal setting scaffolds, challenge anticipation, monitoring support..."></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1531,19 +1577,19 @@ function showModuleEditorInline(moduleIndex, module) {
                                 </div>
                                 <div class="ms-2 udl-dimension-items" data-dimension="engagement">
                                     <div class="mb-2">
-                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="Recruiting" id="eng-recruiting">
-                                        <label class="form-check-label" for="eng-recruiting">Recruiting Attention - Emotional salience</label>
-                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-Recruiting" rows="2" placeholder="Evidence..."></textarea>
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="WelcomingIdentities" id="eng-welcoming-identities">
+                                        <label class="form-check-label" for="eng-welcoming-identities">Guideline 7: Welcoming Interests & Identities - Optimize choice and address biases</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-WelcomingIdentities" rows="2" placeholder="Evidence: e.g., choice in activities, relevance to identities, authentic representation..."></textarea>
                                     </div>
                                     <div class="mb-2">
-                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="Sustaining" id="eng-sustaining">
-                                        <label class="form-check-label" for="eng-sustaining">Sustaining Effort - Optimize challenge</label>
-                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-Sustaining" rows="2" placeholder="Evidence..."></textarea>
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="SustainingPersistence" id="eng-sustaining-persistence">
+                                        <label class="form-check-label" for="eng-sustaining-persistence">Guideline 8: Sustaining Effort & Persistence - Foster collaboration and feedback</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-SustainingPersistence" rows="2" placeholder="Evidence: e.g., collaborative learning, belonging, action-oriented feedback..."></textarea>
                                     </div>
                                     <div class="mb-2">
-                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="SelfRegulation" id="eng-selfregulation">
-                                        <label class="form-check-label" for="eng-selfregulation">Self-Regulation - Clear expectations</label>
-                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-SelfRegulation" rows="2" placeholder="Evidence..."></textarea>
+                                        <input type="checkbox" class="form-check-input udl-sublevel" data-udl-dim="engagement" value="EmotionalCapacity" id="eng-emotional-capacity">
+                                        <label class="form-check-label" for="eng-emotional-capacity">Guideline 9: Emotional Capacity - Develop awareness and empathy</label>
+                                        <textarea class="form-control form-control-sm mt-1 ms-3 udl-evidence" data-udl-sublevel="engagement-EmotionalCapacity" rows="2" placeholder="Evidence: e.g., recognition of beliefs, self-awareness, restorative practices..."></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -2791,6 +2837,10 @@ function renderModuleStudioDetails(moduleIndex) {
     const detailsContainer = document.getElementById('moduleStudioDetails');
     if (!detailsContainer) return;
 
+    // Remember the currently active sub-tab before re-rendering
+    const activeTab = detailsContainer.querySelector('.nav-link.active[data-bs-target]');
+    const activeTabTarget = activeTab ? activeTab.getAttribute('data-bs-target') : null;
+
     const module = appState.modules[moduleIndex];
     if (!module) {
         detailsContainer.innerHTML = '<p class="text-muted">Module not found</p>';
@@ -2799,6 +2849,22 @@ function renderModuleStudioDetails(moduleIndex) {
 
     detailsContainer.innerHTML = showModuleEditorInline(moduleIndex, module);
     
+    // Restore the previously active sub-tab
+    if (activeTabTarget) {
+        const tabBtn = detailsContainer.querySelector(`.nav-link[data-bs-target="${activeTabTarget}"]`);
+        if (tabBtn) {
+            // Remove active from default tab
+            detailsContainer.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
+            detailsContainer.querySelectorAll('.tab-pane').forEach(p => {
+                p.classList.remove('show', 'active');
+            });
+            // Activate the remembered tab
+            tabBtn.classList.add('active');
+            const pane = detailsContainer.querySelector(activeTabTarget);
+            if (pane) pane.classList.add('show', 'active');
+        }
+    }
+
     // Attach event handlers
     attachModuleStudioHandlers(moduleIndex);
 }
@@ -2807,6 +2873,288 @@ function renderModuleStudioDetails(moduleIndex) {
  * Store currently selected module index
  */
 window.currentModuleStudioIndex = 0;
+
+// ===== DELIVERY PROFILE TAB =====
+/**
+ * Render the programme-level Delivery & Contact Time Profile
+ */
+function renderDeliveryProfile() {
+    const container = document.getElementById('contentDelivery');
+    if (!container) return;
+
+    // Ensure deliveryProfile exists in state
+    if (!appState.deliveryProfile) {
+        appState.deliveryProfile = {
+            deliveryMode: 50,
+            syncAsync: 50,
+            totalEffortHours: 1500,
+            contactHours: { lectures: 0, tutorials: 0, labs: 0, seminars: 0, workshops: 0, other: 0 }
+        };
+    }
+    const dp = appState.deliveryProfile;
+    const totalCredits = appState.credits || appState.totalCredits || 60;
+    const totalEffort = totalCredits * 25; // ECTS: 1 credit = 25 hours
+    dp.totalEffortHours = totalEffort;
+
+    const contactTotal = Object.values(dp.contactHours).reduce((s, v) => s + v, 0);
+    const independentHours = Math.max(0, totalEffort - contactTotal);
+
+    // Delivery mode labels
+    function getDeliveryModeLabel(val) {
+        if (val <= 10) return 'Fully On-Campus';
+        if (val <= 30) return 'Predominantly On-Campus';
+        if (val <= 70) return 'Blended';
+        if (val <= 90) return 'Predominantly Online';
+        return 'Fully Online';
+    }
+
+    function getSyncLabel(val) {
+        if (val <= 10) return 'Fully Synchronous';
+        if (val <= 30) return 'Mostly Synchronous';
+        if (val <= 70) return 'Mixed Sync/Async';
+        if (val <= 90) return 'Mostly Asynchronous';
+        return 'Fully Asynchronous';
+    }
+
+    const modeLabel = getDeliveryModeLabel(dp.deliveryMode);
+    const syncLabel = getSyncLabel(dp.syncAsync);
+
+    // Contact hour types
+    const contactTypes = [
+        { key: 'lectures', label: 'Lectures', icon: '🎤', color: '#0d6efd', desc: 'Traditional / recorded delivery' },
+        { key: 'tutorials', label: 'Tutorials / Seminars', icon: '👥', color: '#6f42c1', desc: 'Small-group facilitated discussion' },
+        { key: 'labs', label: 'Labs / Practicals', icon: '🔬', color: '#198754', desc: 'Hands-on supervised work' },
+        { key: 'seminars', label: 'Directed Study', icon: '📖', color: '#fd7e14', desc: 'Supervised reading / study sessions' },
+        { key: 'workshops', label: 'Workshops', icon: '🛠️', color: '#dc3545', desc: 'Intensive practical sessions' },
+        { key: 'other', label: 'Other Contact', icon: '📌', color: '#6c757d', desc: 'Guest speakers, field trips, etc.' }
+    ];
+
+    // Stacked bar segments
+    const barSegments = contactTypes.map(ct => ({
+        label: ct.label,
+        hours: dp.contactHours[ct.key] || 0,
+        color: ct.color
+    }));
+    barSegments.push({ label: 'Independent Learning', hours: independentHours, color: '#adb5bd' });
+
+    let html = `
+        <h2 class="mb-1">📡 Delivery & Contact Time Profile</h2>
+        <p class="text-muted small mb-4">Programme-level delivery configuration. Based on <strong>${totalCredits} ECTS credits × 25 = ${totalEffort} total learner effort hours</strong>.</p>
+
+        <div class="row g-4">
+            <!-- Left column: Mode sliders -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header"><strong>🏫 Delivery Mode</strong></div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="text-muted">On-Campus</small>
+                                <strong id="deliveryModeLabel" style="font-size: 0.95rem; color: #0d6efd;">${modeLabel}</strong>
+                                <small class="text-muted">Online</small>
+                            </div>
+                            <input type="range" class="form-range" id="sliderDeliveryMode" min="0" max="100" step="5" value="${dp.deliveryMode}"
+                                style="accent-color: #0d6efd;">
+                            <div class="d-flex justify-content-between" style="font-size: 0.75rem; color: #999;">
+                                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="text-muted">Synchronous</small>
+                                <strong id="syncAsyncLabel" style="font-size: 0.95rem; color: #6f42c1;">${syncLabel}</strong>
+                                <small class="text-muted">Asynchronous</small>
+                            </div>
+                            <input type="range" class="form-range" id="sliderSyncAsync" min="0" max="100" step="5" value="${dp.syncAsync}"
+                                style="accent-color: #6f42c1;">
+                            <div class="d-flex justify-content-between" style="font-size: 0.75rem; color: #999;">
+                                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Summary -->
+                <div class="card">
+                    <div class="card-header"><strong>📊 Workload Breakdown</strong></div>
+                    <div class="card-body">
+                        <div style="display: flex; height: 40px; border-radius: 6px; overflow: hidden; border: 1px solid #dee2e6;" id="workloadBar">
+                            ${barSegments.filter(s => s.hours > 0).map(s => {
+                                const pct = (s.hours / totalEffort) * 100;
+                                return `<div style="width: ${pct}%; background-color: ${s.color}; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 600; min-width: ${pct > 5 ? '0' : '0'}px; overflow: hidden;" title="${s.label}: ${s.hours}h (${Math.round(pct)}%)">
+                                    ${pct >= 8 ? `${s.hours}h` : ''}
+                                </div>`;
+                            }).join('')}
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; font-size: 0.8rem;">
+                            ${barSegments.filter(s => s.hours > 0).map(s => `
+                                <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                    <span style="width: 10px; height: 10px; border-radius: 2px; background-color: ${s.color}; display: inline-block;"></span>
+                                    ${s.label}: <strong>${s.hours}h</strong> (${Math.round((s.hours / totalEffort) * 100)}%)
+                                </span>
+                            `).join('')}
+                        </div>
+
+                        <div class="mt-3 p-2 rounded" style="background-color: #f8f9fa; font-size: 0.85rem;">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: #0d6efd;">${contactTotal}</div>
+                                    <small class="text-muted">Contact Hours</small>
+                                </div>
+                                <div class="col-4">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: #adb5bd;">${independentHours}</div>
+                                    <small class="text-muted">Independent</small>
+                                </div>
+                                <div class="col-4">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: #198754;">${totalEffort}</div>
+                                    <small class="text-muted">Total Effort</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right column: Contact hours sliders -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>⏱️ Contact Hours Breakdown</strong>
+                            <span class="badge bg-primary" id="contactTotalBadge">${contactTotal}h of ${totalEffort}h</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        ${contactTypes.map(ct => {
+                            const val = dp.contactHours[ct.key] || 0;
+                            return `
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label mb-0" style="font-size: 0.9rem;">
+                                            ${ct.icon} ${ct.label}
+                                            <span style="font-size: 0.75rem; color: #999;"> — ${ct.desc}</span>
+                                        </label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="number" class="form-control form-control-sm contact-hours-input" 
+                                                data-contact-type="${ct.key}" 
+                                                value="${val}" min="0" max="${totalEffort}"
+                                                style="width: 70px; text-align: center;">
+                                            <small class="text-muted">hrs</small>
+                                        </div>
+                                    </div>
+                                    <input type="range" class="form-range contact-hours-slider" 
+                                        data-contact-type="${ct.key}" 
+                                        min="0" max="${Math.min(totalEffort, 600)}" step="5" value="${val}"
+                                        style="accent-color: ${ct.color};">
+                                </div>
+                            `;
+                        }).join('')}
+
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center" style="font-size: 0.9rem;">
+                            <span>📚 <strong>Independent Learning & Assessment Prep</strong></span>
+                            <span style="font-size: 1.1rem; font-weight: 700; color: #adb5bd;" id="independentHoursDisplay">${independentHours}h</span>
+                        </div>
+                        <div class="mt-2" style="height: 8px; background-color: #dee2e6; border-radius: 4px; overflow: hidden;">
+                            <div style="width: ${totalEffort > 0 ? (contactTotal / totalEffort) * 100 : 0}%; height: 100%; background: linear-gradient(90deg, #0d6efd, #6f42c1, #198754); border-radius: 4px;" id="contactProgressBar"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1" style="font-size: 0.75rem; color: #999;">
+                            <span>0% contact</span>
+                            <span id="contactPercentLabel">${totalEffort > 0 ? Math.round((contactTotal / totalEffort) * 100) : 0}% contact</span>
+                            <span>100% contact</span>
+                        </div>
+
+                        ${contactTotal > totalEffort ? `
+                            <div class="alert alert-danger mt-3 py-2 px-3" style="font-size: 0.85rem;">
+                                ⚠️ <strong>Warning:</strong> Contact hours (${contactTotal}h) exceed total effort hours (${totalEffort}h). Reduce contact hours or increase programme credits.
+                            </div>
+                        ` : ''}
+                        ${contactTotal > 0 && contactTotal < totalEffort * 0.15 ? `
+                            <div class="alert alert-info mt-3 py-2 px-3" style="font-size: 0.85rem;">
+                                💡 Contact hours are below 15% of total effort. This is typical for fully online/distance programmes.
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+
+    // ===== Event Handlers =====
+
+    // Delivery Mode slider
+    document.getElementById('sliderDeliveryMode')?.addEventListener('input', (e) => {
+        dp.deliveryMode = parseInt(e.target.value);
+        document.getElementById('deliveryModeLabel').textContent = getDeliveryModeLabel(dp.deliveryMode);
+        saveToLocalStorage();
+    });
+
+    // Sync/Async slider
+    document.getElementById('sliderSyncAsync')?.addEventListener('input', (e) => {
+        dp.syncAsync = parseInt(e.target.value);
+        document.getElementById('syncAsyncLabel').textContent = getSyncLabel(dp.syncAsync);
+        saveToLocalStorage();
+    });
+
+    // Contact hours sliders
+    container.querySelectorAll('.contact-hours-slider').forEach(slider => {
+        slider.addEventListener('input', (e) => {
+            const type = e.target.dataset.contactType;
+            const val = parseInt(e.target.value);
+            dp.contactHours[type] = val;
+            // Sync the number input
+            container.querySelector(`.contact-hours-input[data-contact-type="${type}"]`).value = val;
+            updateContactSummary();
+            saveToLocalStorage();
+        });
+    });
+
+    // Contact hours number inputs
+    container.querySelectorAll('.contact-hours-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+            const type = e.target.dataset.contactType;
+            const val = Math.max(0, parseInt(e.target.value) || 0);
+            dp.contactHours[type] = val;
+            e.target.value = val;
+            // Sync the slider
+            container.querySelector(`.contact-hours-slider[data-contact-type="${type}"]`).value = val;
+            updateContactSummary();
+            saveToLocalStorage();
+        });
+    });
+
+    function getDeliveryModeLabel(val) {
+        if (val <= 10) return 'Fully On-Campus';
+        if (val <= 30) return 'Predominantly On-Campus';
+        if (val <= 70) return 'Blended';
+        if (val <= 90) return 'Predominantly Online';
+        return 'Fully Online';
+    }
+
+    function getSyncLabel(val) {
+        if (val <= 10) return 'Fully Synchronous';
+        if (val <= 30) return 'Mostly Synchronous';
+        if (val <= 70) return 'Mixed Sync/Async';
+        if (val <= 90) return 'Mostly Asynchronous';
+        return 'Fully Asynchronous';
+    }
+
+    function updateContactSummary() {
+        const newTotal = Object.values(dp.contactHours).reduce((s, v) => s + v, 0);
+        const newIndependent = Math.max(0, totalEffort - newTotal);
+
+        document.getElementById('contactTotalBadge').textContent = `${newTotal}h of ${totalEffort}h`;
+        document.getElementById('independentHoursDisplay').textContent = `${newIndependent}h`;
+        document.getElementById('contactProgressBar').style.width = `${totalEffort > 0 ? (newTotal / totalEffort) * 100 : 0}%`;
+        document.getElementById('contactPercentLabel').textContent = `${totalEffort > 0 ? Math.round((newTotal / totalEffort) * 100) : 0}% contact`;
+
+        // Re-render the full view to update bar chart and warnings
+        renderDeliveryProfile();
+    }
+}
 
 // ===== ONLINE EXPERIENCE (COI) TAB =====
 // ===== LEARNING EXPERIENCE TAB =====
@@ -3622,6 +3970,56 @@ function renderRoadmap() {
         </div>
 
         <div class="roadmap-section">
+            <h3>📡 Delivery Profile</h3>
+            ${(() => {
+                const dp = appState.deliveryProfile;
+                if (!dp) return '<p class="text-muted"><em>No delivery profile configured. Visit the Delivery Profile tab to set up.</em></p>';
+                const totalCredits = appState.credits || appState.totalCredits || 60;
+                const totalEffort = totalCredits * 25;
+                const contactTotal = Object.values(dp.contactHours || {}).reduce((s, v) => s + v, 0);
+                const independentHours = Math.max(0, totalEffort - contactTotal);
+                const modeVal = dp.deliveryMode || 50;
+                const syncVal = dp.syncAsync || 50;
+                const modeLabel = modeVal <= 10 ? 'Fully On-Campus' : modeVal <= 30 ? 'Predominantly On-Campus' : modeVal <= 70 ? 'Blended' : modeVal <= 90 ? 'Predominantly Online' : 'Fully Online';
+                const syncLabel = syncVal <= 10 ? 'Fully Synchronous' : syncVal <= 30 ? 'Mostly Synchronous' : syncVal <= 70 ? 'Mixed Sync/Async' : syncVal <= 90 ? 'Mostly Asynchronous' : 'Fully Asynchronous';
+
+                const contactTypes = [
+                    { key: 'lectures', label: 'Lectures', color: '#0d6efd' },
+                    { key: 'tutorials', label: 'Tutorials', color: '#6f42c1' },
+                    { key: 'labs', label: 'Labs', color: '#198754' },
+                    { key: 'seminars', label: 'Directed Study', color: '#fd7e14' },
+                    { key: 'workshops', label: 'Workshops', color: '#dc3545' },
+                    { key: 'other', label: 'Other', color: '#6c757d' }
+                ];
+                const segments = contactTypes.map(ct => ({ label: ct.label, hours: dp.contactHours?.[ct.key] || 0, color: ct.color }));
+                segments.push({ label: 'Independent', hours: independentHours, color: '#adb5bd' });
+
+                return `
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Delivery Mode:</strong> ${modeLabel} (${modeVal}% online)</p>
+                            <p><strong>Synchronicity:</strong> ${syncLabel} (${syncVal}% async)</p>
+                            <p><strong>Total Effort:</strong> ${totalEffort}h (${totalCredits} ECTS × 25)</p>
+                            <p><strong>Contact Hours:</strong> ${contactTotal}h (${totalEffort > 0 ? Math.round((contactTotal / totalEffort) * 100) : 0}%)</p>
+                            <p><strong>Independent Learning:</strong> ${independentHours}h (${totalEffort > 0 ? Math.round((independentHours / totalEffort) * 100) : 0}%)</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div style="display: flex; height: 32px; border-radius: 6px; overflow: hidden; border: 1px solid #dee2e6;">
+                                ${segments.filter(s => s.hours > 0).map(s => {
+                                    const pct = (s.hours / totalEffort) * 100;
+                                    return '<div style="width: ' + pct + '%; background-color: ' + s.color + '; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 600;" title="' + s.label + ': ' + s.hours + 'h (' + Math.round(pct) + '%)">' + (pct >= 8 ? s.hours + 'h' : '') + '</div>';
+                                }).join('')}
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.75rem;">
+                                ${segments.filter(s => s.hours > 0).map(s => '<span style="display: inline-flex; align-items: center; gap: 3px;"><span style="width: 8px; height: 8px; border-radius: 2px; background-color: ' + s.color + '; display: inline-block;"></span>' + s.label + ': ' + s.hours + 'h</span>').join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            })()}
+        </div>
+
+        <div class="roadmap-section">
             <h3>♿ Universal Design for Learning (UDL) Coverage</h3>
             <p class="text-muted small">Heatmap showing which modules address each UDL guideline. <span style="color: #28a745; font-weight: bold;">●</span> = Evidence documented, <span style="color: #e9ecef; font-weight: bold;">●</span> = Not addressed</p>
             
@@ -3636,10 +4034,10 @@ function renderRoadmap() {
         </div>
 
         <div class="roadmap-section">
-            <h3>🎯 Community of Inquiry (CoI): Cognitive Presence Heat Map</h3>
-            <p class="text-muted small">Intensity visualization showing how well each stage of the inquiry cycle is supported across your programme. The four-stage cycle: <strong>Trigger Event → Exploration → Integration → Resolution</strong></p>
+            <h3>� Community of Inquiry (CoI): Teaching & Social Presence</h3>
+            <p class="text-muted small">Overview of Teaching and Social presence elements configured for your programme. These elements support instructor engagement and learner community-building across the programme.</p>
             
-            ${renderCOIIntensityHeatmap()}
+            ${renderCOIPresenceHeatmap()}
         </div>
 
         <div class="roadmap-section">
@@ -3654,104 +4052,147 @@ function renderRoadmap() {
 }
 
 /**
- * Render UDL Evidence heatmap for roadmap
+ * Render UDL Evidence heatmap for roadmap — 3-column layout by Means
  */
 function renderUDLHeatmap() {
     if (!appState.modules || appState.modules.length === 0) {
         return '<p class="text-muted"><em>No modules yet. Add modules to see UDL coverage.</em></p>';
     }
 
-    // Define UDL structure
-    const udlDimensions = {
-        representation: {
-            label: '📊 Representation',
-            sublevels: ['Perception', 'Language', 'Comprehension']
-        },
-        actionExpression: {
-            label: '🎯 Action & Expression',
-            sublevels: ['PhysicalAction', 'Expression', 'Executive']
-        },
-        engagement: {
+    // Define UDL structure (Guidelines 3.0)
+    const udlDimensions = [
+        {
+            key: 'engagement',
             label: '💡 Engagement',
-            sublevels: ['Recruiting', 'Sustaining', 'SelfRegulation']
+            color: '#6f42c1',
+            bgColor: '#f3e8ff',
+            sublevels: [
+                { value: 'WelcomingIdentities', label: 'Guideline 7: Welcoming Interests & Identities' },
+                { value: 'SustainingPersistence', label: 'Guideline 8: Sustaining Effort & Persistence' },
+                { value: 'EmotionalCapacity', label: 'Guideline 9: Emotional Capacity' }
+            ]
+        },
+        {
+            key: 'representation',
+            label: '📊 Representation',
+            color: '#0d6efd',
+            bgColor: '#e8f0fe',
+            sublevels: [
+                { value: 'Perception', label: 'Guideline 1: Perception' },
+                { value: 'Language', label: 'Guideline 2: Language & Symbols' },
+                { value: 'BuildingKnowledge', label: 'Guideline 3: Building Knowledge' }
+            ]
+        },
+        {
+            key: 'actionExpression',
+            label: '🎯 Action & Expression',
+            color: '#198754',
+            bgColor: '#e8f5e9',
+            sublevels: [
+                { value: 'Interaction', label: 'Guideline 4: Interaction' },
+                { value: 'Expression', label: 'Guideline 5: Expression & Communication' },
+                { value: 'StrategyDevelopment', label: 'Guideline 6: Strategy Development' }
+            ]
         }
-    };
+    ];
 
-    // Build matrix data
     const modules = appState.modules;
-    const allSublevels = [];
-    Object.values(udlDimensions).forEach(dim => {
-        dim.sublevels.forEach(sub => {
-            allSublevels.push({ dimension: Object.keys(udlDimensions).find(k => udlDimensions[k] === dim), sublevel: sub });
-        });
+
+    // Build the 3-column layout
+    let html = `
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+    `;
+
+    udlDimensions.forEach(dim => {
+        html += `
+            <div style="border: 2px solid ${dim.color}; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: ${dim.color}; color: white; padding: 0.75rem; text-align: center; font-weight: bold; font-size: 1rem;">
+                    ${dim.label}
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 0.5rem; text-align: left; background-color: ${dim.bgColor}; border: 1px solid #dee2e6; min-width: 140px;">
+                                    <small><strong>Guideline</strong></small>
+                                </th>
+                                ${modules.map(mod => `
+                                    <th style="padding: 0.4rem; text-align: center; background-color: ${dim.bgColor}; border: 1px solid #dee2e6; min-width: 70px; max-width: 100px;">
+                                        <small title="${escapeHtml(mod.title)}"><strong>${escapeHtml(mod.title.substring(0, 12))}${mod.title.length > 12 ? '…' : ''}</strong></small>
+                                    </th>
+                                `).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${dim.sublevels.map(sub => {
+                                return `
+                                    <tr>
+                                        <td style="padding: 0.5rem; text-align: left; border: 1px solid #dee2e6; background-color: ${dim.bgColor};">
+                                            <small><strong>${sub.label}</strong></small>
+                                        </td>
+                                        ${modules.map(mod => {
+                                            const evidence = mod.udlEvidence?.find(e => e.dimension === dim.key && e.sublevel === sub.value);
+                                            const hasEvidence = evidence && evidence.evidence;
+                                            const bgColor = hasEvidence ? '#d4edda' : '#fff';
+                                            const borderColor = hasEvidence ? '#28a745' : '#dee2e6';
+                                            const title = hasEvidence ? evidence.evidence.substring(0, 150) : 'No evidence documented';
+                                            
+                                            return `
+                                                <td style="padding: 0.4rem; text-align: center; border: 1px solid ${borderColor}; background-color: ${bgColor}; cursor: pointer;" 
+                                                    title="${escapeHtml(title)}"
+                                                    onmouseover="this.style.backgroundColor='${hasEvidence ? '#c3e6cb' : '#e9ecef'}'; this.style.boxShadow='0 0 4px rgba(0,0,0,0.1)';"
+                                                    onmouseout="this.style.backgroundColor='${bgColor}'; this.style.boxShadow='none';">
+                                                    <span style="font-size: 1.1rem;">${hasEvidence ? '✓' : '–'}</span>
+                                                </td>
+                                            `;
+                                        }).join('')}
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding: 0.5rem 0.75rem; background-color: ${dim.bgColor}; border-top: 1px solid #dee2e6; font-size: 0.8rem;">
+                    ${(() => {
+                        const totalPossible = modules.length * dim.sublevels.length;
+                        const totalCovered = modules.reduce((acc, mod) => {
+                            return acc + dim.sublevels.filter(sub => 
+                                mod.udlEvidence?.find(e => e.dimension === dim.key && e.sublevel === sub.value && e.evidence)
+                            ).length;
+                        }, 0);
+                        const pct = totalPossible > 0 ? Math.round((totalCovered / totalPossible) * 100) : 0;
+                        const barColor = pct === 0 ? '#dc3545' : pct < 50 ? '#ffc107' : '#28a745';
+                        return `
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <strong>${totalCovered}/${totalPossible}</strong>
+                                <div style="flex: 1; height: 8px; background-color: #dee2e6; border-radius: 4px; overflow: hidden;">
+                                    <div style="width: ${pct}%; height: 100%; background-color: ${barColor}; border-radius: 4px;"></div>
+                                </div>
+                                <small><strong>${pct}%</strong></small>
+                            </div>
+                        `;
+                    })()}
+                </div>
+            </div>
+        `;
     });
 
-    // Create heatmap HTML
-    let html = `
-        <div style="overflow-x: auto; margin-top: 1rem;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-                <thead>
-                    <tr>
-                        <th style="padding: 0.75rem; text-align: left; background-color: #f8f9fa; border: 1px solid #dee2e6; min-width: 180px;"><strong>UDL Guideline</strong></th>
-                        ${modules.map(mod => `
-                            <th style="padding: 0.5rem; text-align: center; background-color: #f8f9fa; border: 1px solid #dee2e6; min-width: 120px; word-wrap: break-word;">
-                                <small><strong>${escapeHtml(mod.title.substring(0, 20))}</strong></small>
-                            </th>
-                        `).join('')}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${allSublevels.map(item => {
-                        const dimensionKey = item.dimension;
-                        const sublevel = item.sublevel;
-                        const displayLabel = {
-                            'Perception': '👁️ Perception',
-                            'Language': '🔤 Language & Symbols',
-                            'Comprehension': '🧠 Comprehension',
-                            'PhysicalAction': '🖱️ Physical Action',
-                            'Expression': '🗣️ Expression',
-                            'Executive': '⚙️ Executive Functions',
-                            'Recruiting': '🎪 Recruiting Attention',
-                            'Sustaining': '💪 Sustaining Effort',
-                            'SelfRegulation': '⚖️ Self-Regulation'
-                        }[sublevel] || sublevel;
+    html += `</div>`;
 
-                        return `
-                            <tr>
-                                <td style="padding: 0.75rem; text-align: left; border: 1px solid #dee2e6; background-color: #f8f9fa;">
-                                    <small><strong>${displayLabel}</strong></small>
-                                </td>
-                                ${modules.map(mod => {
-                                    const evidence = mod.udlEvidence?.find(e => e.dimension === dimensionKey && e.sublevel === sublevel);
-                                    const hasEvidence = evidence && evidence.evidence;
-                                    const bgColor = hasEvidence ? '#d4edda' : '#f8f9fa';
-                                    const borderColor = hasEvidence ? '#28a745' : '#dee2e6';
-                                    const title = hasEvidence ? `Evidence: ${evidence.evidence.substring(0, 100)}...` : 'No evidence documented';
-                                    
-                                    return `
-                                        <td style="padding: 0.5rem; text-align: center; border: 1px solid ${borderColor}; background-color: ${bgColor}; cursor: pointer;" 
-                                            title="${escapeHtml(title)}"
-                                            onmouseover="this.style.backgroundColor='${hasEvidence ? '#c3e6cb' : '#e9ecef'}'; this.style.boxShadow='0 0 4px rgba(0,0,0,0.1)';"
-                                            onmouseout="this.style.backgroundColor='${bgColor}'; this.style.boxShadow='none';">
-                                            <span style="font-size: 1.2rem;">${hasEvidence ? '✓' : '–'}</span>
-                                        </td>
-                                    `;
-                                }).join('')}
-                            </tr>
-                        `;
-                    }).join('')}
-                </tbody>
-            </table>
-        </div>
-
-        <div style="margin-top: 1.5rem; padding: 1rem; background-color: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
-            <p><strong>Coverage Summary:</strong></p>
-            <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+    // Overall summary
+    html += `
+        <div style="margin-top: 1rem; padding: 0.75rem 1rem; background-color: #f8f9fa; border-radius: 4px; font-size: 0.85rem;">
+            <strong>Per-Module Summary:</strong>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem;">
                 ${modules.map(mod => {
                     const totalEvidence = mod.udlEvidence?.filter(e => e.evidence)?.length || 0;
-                    return `<li>${escapeHtml(mod.title)}: <strong>${totalEvidence}/9</strong> UDL guidelines addressed</li>`;
+                    const pct = Math.round((totalEvidence / 9) * 100);
+                    const color = pct === 0 ? '#dc3545' : pct < 50 ? '#ffc107' : '#28a745';
+                    return `<span style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid ${color}; background-color: ${color}15;">
+                        <small>${escapeHtml(mod.title.substring(0, 20))}: <strong>${totalEvidence}/9</strong></small>
+                    </span>`;
                 }).join('')}
-            </ul>
+            </div>
         </div>
     `;
 
@@ -3759,46 +4200,84 @@ function renderUDLHeatmap() {
 }
 
 /**
- * Render UDL Intensity heatmap - shows coverage density for each UDL subcategory
+ * Render UDL Intensity heatmap - 3-column layout by Means showing coverage density
  */
 function renderUDLIntensityHeatmap() {
     if (!appState.modules || appState.modules.length === 0) {
         return '<p class="text-muted"><em>No modules yet. Add modules to see UDL coverage intensity.</em></p>';
     }
 
-    const udlCategories = [
-        { dimension: 'representation', sublevel: 'Perception', label: '👁️ Perception' },
-        { dimension: 'representation', sublevel: 'Language', label: '🔤 Language & Symbols' },
-        { dimension: 'representation', sublevel: 'Comprehension', label: '🧠 Comprehension' },
-        { dimension: 'actionExpression', sublevel: 'PhysicalAction', label: '🖱️ Physical Action' },
-        { dimension: 'actionExpression', sublevel: 'Expression', label: '🗣️ Expression' },
-        { dimension: 'actionExpression', sublevel: 'Executive', label: '⚙️ Executive Functions' },
-        { dimension: 'engagement', sublevel: 'Recruiting', label: '🎪 Recruiting Attention' },
-        { dimension: 'engagement', sublevel: 'Sustaining', label: '💪 Sustaining Effort' },
-        { dimension: 'engagement', sublevel: 'SelfRegulation', label: '⚖️ Self-Regulation' }
+    const udlColumns = [
+        {
+            title: '💡 Engagement',
+            color: '#6f42c1',
+            bgColor: '#f3e8ff',
+            categories: [
+                { dimension: 'engagement', sublevel: 'WelcomingIdentities', label: 'G7: Welcoming Interests & Identities' },
+                { dimension: 'engagement', sublevel: 'SustainingPersistence', label: 'G8: Sustaining Effort & Persistence' },
+                { dimension: 'engagement', sublevel: 'EmotionalCapacity', label: 'G9: Emotional Capacity' }
+            ]
+        },
+        {
+            title: '📊 Representation',
+            color: '#0d6efd',
+            bgColor: '#e8f0fe',
+            categories: [
+                { dimension: 'representation', sublevel: 'Perception', label: 'G1: Perception' },
+                { dimension: 'representation', sublevel: 'Language', label: 'G2: Language & Symbols' },
+                { dimension: 'representation', sublevel: 'BuildingKnowledge', label: 'G3: Building Knowledge' }
+            ]
+        },
+        {
+            title: '🎯 Action & Expression',
+            color: '#198754',
+            bgColor: '#e8f5e9',
+            categories: [
+                { dimension: 'actionExpression', sublevel: 'Interaction', label: 'G4: Interaction' },
+                { dimension: 'actionExpression', sublevel: 'Expression', label: 'G5: Expression & Communication' },
+                { dimension: 'actionExpression', sublevel: 'StrategyDevelopment', label: 'G6: Strategy Development' }
+            ]
+        }
     ];
 
-    let html = `<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">`;
+    let html = `<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">`;
 
-    udlCategories.forEach((cat, idx) => {
-        const coverage = appState.modules.filter(mod => 
-            mod.udlEvidence?.find(e => e.dimension === cat.dimension && e.sublevel === cat.sublevel && e.evidence)
-        ).length;
+    udlColumns.forEach(col => {
+        html += `
+            <div style="border: 2px solid ${col.color}; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: ${col.color}; color: white; padding: 0.6rem; text-align: center; font-weight: bold; font-size: 0.95rem;">
+                    ${col.title}
+                </div>
+                <div style="padding: 0.75rem; display: flex; flex-direction: column; gap: 0.75rem;">
+        `;
 
-        const coveragePercent = (coverage / appState.modules.length) * 100;
-        let heatColor;
-        if (coveragePercent === 0) heatColor = '#dc3545'; // Red
-        else if (coveragePercent < 33) heatColor = '#fd7e14'; // Orange
-        else if (coveragePercent < 67) heatColor = '#ffc107'; // Yellow
-        else heatColor = '#28a745'; // Green
+        col.categories.forEach(cat => {
+            const coverage = appState.modules.filter(mod => 
+                mod.udlEvidence?.find(e => e.dimension === cat.dimension && e.sublevel === cat.sublevel && e.evidence)
+            ).length;
+
+            const coveragePercent = appState.modules.length > 0 ? (coverage / appState.modules.length) * 100 : 0;
+            let heatColor;
+            if (coveragePercent === 0) heatColor = '#dc3545';
+            else if (coveragePercent < 33) heatColor = '#fd7e14';
+            else if (coveragePercent < 67) heatColor = '#ffc107';
+            else heatColor = '#28a745';
+
+            html += `
+                <div style="padding: 0.75rem; border-radius: 6px; background-color: ${heatColor}15; border: 1px solid ${heatColor}40; text-align: center;">
+                    <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">${cat.label}</div>
+                    <div style="font-size: 1.6rem; font-weight: bold; color: ${heatColor}; margin-bottom: 0.3rem;">${coverage}/${appState.modules.length}</div>
+                    <div style="height: 6px; background-color: #dee2e6; border-radius: 3px; overflow: hidden; margin-bottom: 0.3rem;">
+                        <div style="width: ${coveragePercent}%; height: 100%; background-color: ${heatColor}; border-radius: 3px;"></div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #666;">
+                        <strong>${Math.round(coveragePercent)}%</strong> covered
+                    </div>
+                </div>
+            `;
+        });
 
         html += `
-            <div style="flex: 0 0 calc(25% - 0.75rem); min-width: 160px; padding: 1rem; border-radius: 8px; background-color: ${heatColor}20; border: 2px solid ${heatColor}; text-align: center;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">${cat.label}</div>
-                <div style="font-size: 2rem; font-weight: bold; color: ${heatColor}; margin-bottom: 0.5rem;">${coverage}/${appState.modules.length}</div>
-                <div style="font-size: 0.85rem; color: #555;">
-                    <strong>${Math.round(coveragePercent)}%</strong> covered<br>
-                    <small>${appState.modules.length - coverage} module${appState.modules.length - coverage !== 1 ? 's' : ''} need coverage</small>
                 </div>
             </div>
         `;
@@ -3809,52 +4288,112 @@ function renderUDLIntensityHeatmap() {
 }
 
 /**
- * Render CoI (Community of Inquiry) Intensity heatmap - shows cognitive presence coverage
+ * Render CoI Teaching & Social Presence heatmap - 2-column layout
  */
-function renderCOIIntensityHeatmap() {
-    const coiPhases = [
-        { key: 'trigger', label: '🎯 Trigger Event', description: 'Stimulating student curiosity' },
-        { key: 'exploration', label: '🔍 Exploration', description: 'Divergent thinking and idea generation' },
-        { key: 'integration', label: '🔗 Integration', description: 'Convergent thinking and synthesis' },
-        { key: 'resolution', label: '✅ Resolution', description: 'Application and confirmation' }
+function renderCOIPresenceHeatmap() {
+    const teachingElements = [
+        { key: 'announcement', label: '📢 Announcement', description: 'Regular updates and guidance' },
+        { key: 'live', label: '🎥 Live Session', description: 'Synchronous teaching events' },
+        { key: 'office', label: '☎️ Office Hour', description: 'Individual student support' },
+        { key: 'feedback', label: '📝 Feedback', description: 'Formative and summative responses' },
+        { key: 'qa', label: '❓ Q&A Forum', description: 'Asynchronous question support' },
+        { key: 'recorded', label: '📹 Recorded Lecture', description: 'Asynchronous content delivery' },
+        { key: 'syllabus', label: '📋 Syllabus / Guidance', description: 'Structure and expectations' },
+        { key: 'rubric', label: '🏆 Rubric / Assessment Guide', description: 'Assessment criteria clarity' },
+        { key: 'examples', label: '✅ Example Solutions', description: 'Worked examples and models' },
+        { key: 'guide', label: '📖 Study Guide', description: 'Directed learning support' }
     ];
 
-    let html = `<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">`;
+    const socialElements = [
+        { key: 'cohort', label: '👥 Cohort Activity', description: 'Whole-group engagement' },
+        { key: 'triads', label: '👫 Peer Triads', description: 'Small group collaboration' },
+        { key: 'checkin', label: '💬 Group Check-in', description: 'Regular wellbeing touchpoints' },
+        { key: 'speed', label: '🎲 Speed Networking', description: 'Rapid peer connections' },
+        { key: 'icebreaker', label: '🤝 Social Icebreaker', description: 'Community building activities' },
+        { key: 'study', label: '📚 Study Groups', description: 'Collaborative learning clusters' },
+        { key: 'mentoring', label: '🎓 Peer Mentoring', description: 'Experienced learner support' },
+        { key: 'circles', label: '💭 Discussion Circles', description: 'Structured dialogue' },
+        { key: 'event', label: '🎉 Community Event', description: 'Informal social gatherings' },
+        { key: 'social', label: '📱 Social Media Group', description: 'Informal digital community' }
+    ];
 
-    coiPhases.forEach(phase => {
-        // Check programme-level availability of cognitive presence
-        const available = appState.learningExperience?.availablePresence?.cognitive?.includes(phase.key);
-        
-        // Count modules that might use this (simplified: if selected at programme level, assume potential)
-        const availability = available ? 'Available ✓' : 'Not Selected';
-        const heatColor = available ? '#28a745' : '#dc3545';
-        const bgOpacity = available ? '20' : '20';
+    const availablePresence = appState.learningExperience?.availablePresence || { teaching: [], social: [], cognitive: [] };
+
+    const columns = [
+        {
+            title: '🎓 Teaching Presence',
+            color: '#0d6efd',
+            bgColor: '#e8f0fe',
+            elements: teachingElements,
+            selected: availablePresence.teaching || []
+        },
+        {
+            title: '👫 Social Presence',
+            color: '#198754',
+            bgColor: '#e8f5e9',
+            elements: socialElements,
+            selected: availablePresence.social || []
+        }
+    ];
+
+    // Count per-week usage across all modules
+    const weeks = appState.learningExperience?.weeks || [];
+
+    let html = `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">`;
+
+    columns.forEach(col => {
+        const activeCount = col.selected.length;
+        const totalCount = col.elements.length;
+        const pct = totalCount > 0 ? Math.round((activeCount / totalCount) * 100) : 0;
 
         html += `
-            <div style="flex: 0 0 calc(25% - 0.75rem); min-width: 180px; padding: 1rem; border-radius: 8px; background-color: ${heatColor}${bgOpacity}; border: 2px solid ${heatColor}; text-align: center;">
-                <div style="font-size: 1.2rem; margin-bottom: 0.5rem;"><strong>${phase.label}</strong></div>
-                <div style="font-size: 0.9rem; color: #555; margin-bottom: 0.75rem;">${phase.description}</div>
-                <div style="font-size: 1.5rem; font-weight: bold; color: ${heatColor}; padding: 0.75rem; background-color: white; border-radius: 4px; border: 1px solid ${heatColor};">
-                    ${available ? '✓ Active' : '✗ Inactive'}
+            <div style="border: 2px solid ${col.color}; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: ${col.color}; color: white; padding: 0.75rem; text-align: center; font-weight: bold; font-size: 1rem;">
+                    ${col.title}
+                </div>
+                <div style="padding: 0.75rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        ${col.elements.map(elem => {
+                            const isActive = col.selected.includes(elem.key);
+                            const heatColor = isActive ? '#28a745' : '#dee2e6';
+                            const bgColor = isActive ? '#d4edda' : '#f8f9fa';
+                            const textColor = isActive ? '#155724' : '#999';
+                            const icon = isActive ? '✓' : '–';
+
+                            // Count how many weeks use this element
+                            const weekType = col.title.includes('Teaching') ? 'teachingPresence' : 'socialPresence';
+                            const weekUsage = weeks.filter(w => {
+                                const items = w[weekType] || [];
+                                return items.some(item => item.toLowerCase().includes(elem.key));
+                            }).length;
+
+                            return `
+                                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 6px; background-color: ${bgColor}; border: 1px solid ${heatColor};">
+                                    <span style="font-size: 1rem; color: ${heatColor}; font-weight: bold; min-width: 20px;">${icon}</span>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 0.85rem; font-weight: 600; color: ${textColor};">${elem.label}</div>
+                                        <div style="font-size: 0.75rem; color: #777;">${elem.description}</div>
+                                    </div>
+                                    ${weekUsage > 0 ? `<span style="font-size: 0.75rem; padding: 0.15rem 0.4rem; border-radius: 10px; background-color: ${col.color}20; color: ${col.color}; font-weight: 600;">${weekUsage} wk${weekUsage !== 1 ? 's' : ''}</span>` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                <div style="padding: 0.5rem 0.75rem; background-color: ${col.bgColor}; border-top: 1px solid #dee2e6; font-size: 0.85rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <strong>${activeCount}/${totalCount} active</strong>
+                        <div style="flex: 1; height: 8px; background-color: #dee2e6; border-radius: 4px; overflow: hidden;">
+                            <div style="width: ${pct}%; height: 100%; background-color: ${col.color}; border-radius: 4px;"></div>
+                        </div>
+                        <small><strong>${pct}%</strong></small>
+                    </div>
                 </div>
             </div>
         `;
     });
 
     html += `</div>`;
-    
-    html += `
-        <div style="margin-top: 1.5rem; padding: 1rem; background-color: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
-            <p><strong>💡 About Community of Inquiry (CoI):</strong></p>
-            <p>The inquiry cycle model shows how students progress through meaningful learning. Configure which phases are available in your <strong>Programme Design → Learning Experience → Cognitive Presence</strong> section.</p>
-            <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0; font-size: 0.85rem;">
-                <li><strong>Trigger:</strong> How you initiate learning (motivating questions, scenarios)</li>
-                <li><strong>Exploration:</strong> How students brainstorm and investigate</li>
-                <li><strong>Integration:</strong> How students consolidate and synthesize ideas</li>
-                <li><strong>Resolution:</strong> How students apply and confirm learning</li>
-            </ul>
-        </div>
-    `;
 
     return html;
 }
@@ -4279,6 +4818,7 @@ function renderAllTabs() {
     renderBackwardDesign();
     renderAlignmentMap();
     renderModuleStudio();
+    renderDeliveryProfile();
     renderLearningExperience();
     renderRoadmap();
     renderExport();

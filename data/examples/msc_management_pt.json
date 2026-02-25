@@ -377,17 +377,17 @@
       "udlEvidence": [
         {
           "dimension": "representation",
-          "sublevel": "Comprehension",
+          "sublevel": "BuildingKnowledge",
           "evidence": "Leadership theories introduced via live case discussion, then anchored to students' own organisational contexts. Prior knowledge activated through icebreaker interviews."
         },
         {
           "dimension": "actionExpression",
-          "sublevel": "PhysicalAction",
+          "sublevel": "Interaction",
           "evidence": "Assessment options include written response, video presentation, or live spoken debate. Synchronous component accessible async via recordings."
         },
         {
           "dimension": "engagement",
-          "sublevel": "Sustaining",
+          "sublevel": "SustainingPersistence",
           "evidence": "Peer feedback embedded throughout; group work provides social accountability; tutor recognises exemplar contributions publicly in forum"
         }
       ],

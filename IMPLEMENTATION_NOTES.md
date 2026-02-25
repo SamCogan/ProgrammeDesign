@@ -468,10 +468,23 @@ const assessmentTypes = [
 <option value="high">High</option>
 ```
 
-**UDL Dimensions:**
-- representation (Perception, Language, Comprehension)
-- actionExpression (PhysicalAction, Expression, Executive)
-- engagement (Recruiting, Sustaining, Self-Regulating)
+**UDL Dimensions (Guidelines 3.0 - Updated July 2024):**
+- representation:
+  - Guideline 1: Perception - Support multiple ways to perceive information
+  - Guideline 2: Language & Symbols - Clarify vocabulary and address biases
+  - Guideline 3: Building Knowledge - Cultivate multiple ways of knowing
+- actionExpression:
+  - Guideline 4: Interaction - Vary methods for response, navigation, and movement
+  - Guideline 5: Expression & Communication - Use multiple media and tools
+  - Guideline 6: Strategy Development - Set goals and anticipate challenges
+- engagement:
+  - Guideline 7: Welcoming Interests & Identities - Optimize choice and address biases
+  - Guideline 8: Sustaining Effort & Persistence - Foster collaboration and feedback
+  - Guideline 9: Emotional Capacity - Develop awareness and empathy
+
+**Note:** Guidelines 2.2 data is automatically migrated to 3.0 format on load.
+Mapping: Comprehension→BuildingKnowledge, PhysicalAction→Interaction, Executive→StrategyDevelopment,
+Recruiting→WelcomingIdentities, Sustaining→SustainingPersistence, SelfRegulation→EmotionalCapacity
 
 ---
 
