@@ -3095,21 +3095,8 @@ function renderDeliveryProfile() {
                 <div class="card">
                     <div class="card-header"><strong>📊 Workload Breakdown</strong></div>
                     <div class="card-body">
-                        <div style="display: flex; height: 40px; border-radius: 6px; overflow: hidden; border: 1px solid #dee2e6;" id="workloadBar">
-                            ${barSegments.filter(s => s.hours > 0).map(s => {
-                                const pct = (s.hours / totalEffort) * 100;
-                                return `<div style="width: ${pct}%; background-color: ${s.color}; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 600; min-width: ${pct > 5 ? '0' : '0'}px; overflow: hidden;" title="${s.label}: ${s.hours}h (${Math.round(pct)}%)">
-                                    ${pct >= 8 ? `${s.hours}h` : ''}
-                                </div>`;
-                            }).join('')}
-                        </div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; font-size: 0.8rem;">
-                            ${barSegments.filter(s => s.hours > 0).map(s => `
-                                <span style="display: inline-flex; align-items: center; gap: 4px;">
-                                    <span style="width: 10px; height: 10px; border-radius: 2px; background-color: ${s.color}; display: inline-block;"></span>
-                                    ${s.label}: <strong>${s.hours}h</strong> (${Math.round((s.hours / totalEffort) * 100)}%)
-                                </span>
-                            `).join('')}
+                        <div style="position: relative; max-width: 320px; margin: 0 auto;">
+                            <canvas id="workloadPieChart"></canvas>
                         </div>
 
                         <div class="mt-3 p-2 rounded" style="background-color: #f8f9fa; font-size: 0.85rem;">
@@ -3199,6 +3186,69 @@ function renderDeliveryProfile() {
 
     container.innerHTML = html;
 
+    // ===== Initialise Workload Pie Chart (Chart.js) =====
+    let workloadChart = null;
+    const pieCanvas = document.getElementById('workloadPieChart');
+    if (pieCanvas && typeof Chart !== 'undefined') {
+        const activeSegments = barSegments.filter(s => s.hours > 0);
+        workloadChart = new Chart(pieCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: activeSegments.map(s => s.label),
+                datasets: [{
+                    data: activeSegments.map(s => s.hours),
+                    backgroundColor: activeSegments.map(s => s.color),
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '55%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 14,
+                            usePointStyle: true,
+                            pointStyleWidth: 10,
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                const val = ctx.parsed;
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                return ` ${ctx.label}: ${val}h (${pct}%)`;
+                            }
+                        }
+                    }
+                }
+            },
+            plugins: [{
+                id: 'centreText',
+                afterDraw(chart) {
+                    const { ctx, chartArea: { top, bottom, left, right } } = chart;
+                    const centreX = (left + right) / 2;
+                    const centreY = (top + bottom) / 2;
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = 'bold 1.4rem system-ui, sans-serif';
+                    ctx.fillStyle = '#198754';
+                    ctx.fillText(`${totalEffort}h`, centreX, centreY - 8);
+                    ctx.font = '0.7rem system-ui, sans-serif';
+                    ctx.fillStyle = '#6c757d';
+                    ctx.fillText('Total Effort', centreX, centreY + 12);
+                    ctx.restore();
+                }
+            }]
+        });
+    }
+
     // ===== Event Handlers =====
 
     // Delivery Mode slider
@@ -3267,7 +3317,28 @@ function renderDeliveryProfile() {
         document.getElementById('contactProgressBar').style.width = `${totalEffort > 0 ? (newTotal / totalEffort) * 100 : 0}%`;
         document.getElementById('contactPercentLabel').textContent = `${totalEffort > 0 ? Math.round((newTotal / totalEffort) * 100) : 0}% contact`;
 
-        // Re-render the full view to update bar chart and warnings
+        // Update the pie chart data reactively
+        if (workloadChart) {
+            const updatedSegments = contactTypes.map(ct => ({
+                label: ct.label,
+                hours: dp.contactHours[ct.key] || 0,
+                color: ct.color
+            }));
+            updatedSegments.push({ label: 'Remaining Self-Study', hours: newIndependent, color: '#e9ecef' });
+            const active = updatedSegments.filter(s => s.hours > 0);
+            workloadChart.data.labels = active.map(s => s.label);
+            workloadChart.data.datasets[0].data = active.map(s => s.hours);
+            workloadChart.data.datasets[0].backgroundColor = active.map(s => s.color);
+            workloadChart.update();
+        }
+
+        // Update the summary numbers below the chart
+        const contactHoursEl = container.querySelector('.col-4:nth-child(1) div');
+        const independentEl = container.querySelector('.col-4:nth-child(2) div');
+        if (contactHoursEl) contactHoursEl.textContent = newTotal;
+        if (independentEl) independentEl.textContent = newIndependent;
+
+        // Update warnings by re-rendering
         renderDeliveryProfile();
     }
 }
