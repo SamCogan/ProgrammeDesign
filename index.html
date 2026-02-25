@@ -34,6 +34,9 @@
                         <button class="btn btn-sm btn-warning me-2" id="btnReset" title="Reset to blank">
                             🔄 Reset
                         </button>
+                        <button class="btn btn-sm btn-outline-light me-2" id="btnHelp" title="About this tool">
+                            ❓ Help
+                        </button>
                         <span class="badge bg-success" id="autoSaveStatus">Auto-saved</span>
                     </div>
                 </div>
@@ -48,6 +51,9 @@
                 <div class="nav flex-column nav-pills" id="tabNav" role="tablist">
                     <button class="nav-link active" id="tabCanvas" data-bs-toggle="pill" data-bs-target="#contentCanvas" type="button" role="tab">
                         🖼️ Canvas
+                    </button>
+                    <button class="nav-link" id="tabPersonas" data-bs-toggle="pill" data-bs-target="#contentPersonas" type="button" role="tab">
+                        🧑‍🤝‍🧑 Personas
                     </button>
                     <button class="nav-link" id="tabBackwardDesign" data-bs-toggle="pill" data-bs-target="#contentBackwardDesign" type="button" role="tab">
                         🎯 Backward Design
@@ -82,6 +88,11 @@
                         <div class="row g-4" id="canvasTiles">
                             <!-- Tiles will be rendered here by JS -->
                         </div>
+                    </div>
+
+                    <!-- PERSONAS TAB -->
+                    <div class="tab-pane fade" id="contentPersonas" role="tabpanel">
+                        <!-- Dynamically populated by renderPersonas() -->
                     </div>
 
                     <!-- BACKWARD DESIGN TAB -->
@@ -467,6 +478,128 @@
                         <strong>Full JSON:</strong> Complete programme data for re-import.<br>
                         <strong>Handoff JSON:</strong> Simplified schema for import into programmedev tool.
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome / Splash Modal -->
+    <div class="modal fade" id="welcomeModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="border: none; border-radius: 12px; overflow: hidden;">
+                <!-- Hero header -->
+                <div class="modal-header text-white py-4" style="background: linear-gradient(135deg, #0d6efd 0%, #6f42c1 50%, #198754 100%); border: none;">
+                    <div>
+                        <h3 class="modal-title mb-1" style="font-weight: 700;">🎨 Programme Design Studio</h3>
+                        <p class="mb-0" style="opacity: 0.9; font-size: 0.95rem;">An ideation tool for designing QQI-accredited programmes</p>
+                    </div>
+                </div>
+                <div class="modal-body px-4 py-4" style="max-height: 65vh; overflow-y: auto;">
+                    <p class="mb-4" style="font-size: 0.95rem; line-height: 1.6;">
+                        Programme Design Studio helps academic teams <strong>sketch, stress-test, and iterate</strong> on programme designs before committing to formal documentation. It brings together four established educational frameworks in a single workspace.
+                    </p>
+
+                    <!-- Frameworks -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded h-100" style="background-color: #f3e8ff; border-left: 4px solid #6f42c1;">
+                                <h6 style="color: #6f42c1; margin-bottom: 0.5rem;">🎯 Backward Design</h6>
+                                <p class="mb-0" style="font-size: 0.85rem; line-height: 1.5;">Start with <em>exit capabilities</em> — what a graduate must be able to <strong>do</strong> — then work backward through programme learning outcomes, assessment evidence, and learning activities. Based on Wiggins & McTighe's Understanding by Design.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded h-100" style="background-color: #e8f0fe; border-left: 4px solid #0d6efd;">
+                                <h6 style="color: #0d6efd; margin-bottom: 0.5rem;">🔗 Constructive Alignment</h6>
+                                <p class="mb-0" style="font-size: 0.85rem; line-height: 1.5;">Ensures that <strong>outcomes, assessments, and learning activities</strong> are aligned at every level. Based on John Biggs' Constructive Alignment model — what you teach, how you teach it, and how you assess it should all point in the same direction.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded h-100" style="background-color: #e8f7f0; border-left: 4px solid #198754;">
+                                <h6 style="color: #198754; margin-bottom: 0.5rem;">♿ Universal Design for Learning (3.0)</h6>
+                                <p class="mb-0" style="font-size: 0.85rem; line-height: 1.5;">Track how your modules address the <strong>three UDL means</strong>: Engagement, Representation, and Action & Expression. Based on CAST's UDL Guidelines 3.0 (July 2024) — designing for learner variability from the start.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded h-100" style="background-color: #fff3e0; border-left: 4px solid #fd7e14;">
+                                <h6 style="color: #fd7e14; margin-bottom: 0.5rem;">🌊 Community of Inquiry</h6>
+                                <p class="mb-0" style="font-size: 0.85rem; line-height: 1.5;">Design the learner experience around <strong>Teaching Presence, Social Presence, and Cognitive Presence</strong>. Garrison, Anderson & Archer's CoI framework guides how you structure interaction, facilitation, and inquiry in blended/online programmes.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- How to use -->
+                    <h6 class="mb-3" style="font-weight: 700; color: #333;">How to use this tool</h6>
+                    <div class="row g-2 mb-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-start gap-3 p-2 rounded" style="background-color: #f8f9fa;">
+                                <span style="font-size: 1.3rem; min-width: 30px; text-align: center;">1️⃣</span>
+                                <div>
+                                    <strong>Canvas</strong> — Sketch your programme vision: audience, value proposition, differentiators, and module structure. Think of this as your design napkin.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-start gap-3 p-2 rounded" style="background-color: #f8f9fa;">
+                                <span style="font-size: 1.3rem; min-width: 30px; text-align: center;">2️⃣</span>
+                                <div>
+                                    <strong>Personas</strong> — Activate diverse learner personas and stress-test your design against each person's reality. Use the checklist to ensure your programme works for everyone, not just the "ideal" student.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-start gap-3 p-2 rounded" style="background-color: #f8f9fa;">
+                                <span style="font-size: 1.3rem; min-width: 30px; text-align: center;">3️⃣</span>
+                                <div>
+                                    <strong>Backward Design</strong> — Define exit capabilities, then programme learning outcomes. At module level, map capabilities → assessment evidence → learning activities.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-start gap-3 p-2 rounded" style="background-color: #f8f9fa;">
+                                <span style="font-size: 1.3rem; min-width: 30px; text-align: center;">4️⃣</span>
+                                <div>
+                                    <strong>Module Studio</strong> — Deep-dive into each module: outcomes, assessments, UDL evidence, and learning activities. This is where the detail lives.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-start gap-3 p-2 rounded" style="background-color: #f8f9fa;">
+                                <span style="font-size: 1.3rem; min-width: 30px; text-align: center;">5️⃣</span>
+                                <div>
+                                    <strong>Delivery Profile</strong> — Configure your delivery mode, synchronous/asynchronous split, and contact hours breakdown across the programme.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-start gap-3 p-2 rounded" style="background-color: #f8f9fa;">
+                                <span style="font-size: 1.3rem; min-width: 30px; text-align: center;">6️⃣</span>
+                                <div>
+                                    <strong>Learning Experience</strong> — Define the Community of Inquiry elements (Teaching, Social, Cognitive presence) for your programme and per module.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-start gap-3 p-2 rounded" style="background-color: #f8f9fa;">
+                                <span style="font-size: 1.3rem; min-width: 30px; text-align: center;">7️⃣</span>
+                                <div>
+                                    <strong>Roadmap</strong> — Review a printable summary with UDL heatmaps, CoI coverage, persona inclusivity checks, delivery profile, and alignment insights. Use this for team review or external conversation.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light border mt-3 mb-0" style="font-size: 0.85rem;">
+                        <strong>💡 Tip:</strong> Your work auto-saves to browser storage every 30 seconds. Use <strong>Export</strong> to download a JSON backup, and <strong>Import</strong> to restore it on any device. You can also load the built-in example programme to explore the tool's features.
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #eee;">
+                    <div class="form-check me-auto">
+                        <input class="form-check-input" type="checkbox" id="welcomeDontShowAgain">
+                        <label class="form-check-label small text-muted" for="welcomeDontShowAgain">Don't show this again</label>
+                    </div>
+                    <button type="button" class="btn btn-primary px-4" id="btnWelcomeStart">
+                        Let's Get Started →
+                    </button>
                 </div>
             </div>
         </div>

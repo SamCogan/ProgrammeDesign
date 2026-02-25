@@ -1,0 +1,30 @@
+{
+  "name": "project-name",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "jest": "^27.0.0",
+    "playwright": "^1.0.0",
+    "serve": "^14.2.5"
+  },
+  "description": "A **lightweight, static web app** for ideating and stress-testing academic programme designs using three pedagogical frameworks:",
+  "main": "playwright.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamCogan/ProgrammeDesign.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SamCogan/ProgrammeDesign/issues"
+  },
+  "homepage": "https://github.com/SamCogan/ProgrammeDesign#readme"
+}

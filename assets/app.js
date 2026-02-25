@@ -29,6 +29,113 @@ const EVIDENCE_TYPES = [
     'Research Dissertation'
 ];
 
+// ===== PERSONAS CONSTANTS =====
+const PERSONAS = [
+    {
+        id: 'siobhan',
+        name: 'Siobhán',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Siobhan&top=straight01&facialHairProbability=0&skinColor=ffdbb4&hairColor=a55728&size=150',
+        color: '#e74c3c',
+        tagline: 'Working single parent returning to education',
+        narrative: 'Siobhán is 38 and works full-time as a retail manager. After 15 years away from education she\'s nervous but determined to earn a qualification that opens new doors. She juggles school pickups, shift work, and studying after the kids go to bed. Her real-world experience is a hidden superpower — but she worries about keeping up with younger, more tech-savvy classmates and dreads timed exams.',
+        traits: ['Part-time availability', 'Mature learner', 'Career changer', 'Limited tech confidence', 'Time-poor']
+    },
+    {
+        id: 'kwame',
+        name: 'Kwame',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Kwame&top=shortCurly&skinColor=614335&hairColor=2c1b18&size=150',
+        color: '#2ecc71',
+        tagline: 'International student, English is his third language',
+        narrative: 'Kwame is 24 and recently arrived from Accra, Ghana. English is his third language after Twi and French. He has strong technical skills and a sharp analytical mind, but the speed of spoken lectures and the nuances of academic English trip him up. He\'s unfamiliar with Irish academic conventions like self-directed learning and reflective writing. Visa restrictions limit his working hours, so he\'s under financial pressure too.',
+        traits: ['English as additional language', 'International student', 'Strong STEM skills', 'Unfamiliar with local conventions', 'Financial pressure']
+    },
+    {
+        id: 'liam',
+        name: 'Liam',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=LiamW&top=shortFlat&facialHairProbability=0&skinColor=edb98a&hairColor=b58143&size=150',
+        color: '#3498db',
+        tagline: 'Motor disability, uses assistive technology daily',
+        narrative: 'Liam is 29 and has cerebral palsy affecting his fine motor control. He uses voice recognition software and a specialised keyboard every day. He\'s academically strong and deeply motivated, but poorly designed PDFs, drag-and-drop interfaces, and handwritten assessments become major barriers. He needs well-structured digital materials and enough time to navigate them his way.',
+        traits: ['Motor disability', 'Assistive tech user', 'Strong academic record', 'Needs accessible formats', 'Extra time accommodations']
+    },
+    {
+        id: 'fatima',
+        name: 'Fatima',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=FatimaZ&top=hijab&facialHairProbability=0&skinColor=d08b5b&hairColor=2c1b18&size=150',
+        color: '#9b59b6',
+        tagline: 'Refugee rebuilding her career in a new country',
+        narrative: 'Fatima is 31 and arrived in Ireland from Syria three years ago. She holds an engineering degree but her qualification isn\'t recognised here. She\'s raising two young children while studying, navigating a new culture, and improving her English. She brings resilience, global perspective, and professional experience — but she needs clear instructions, culturally inclusive examples, and flexibility around childcare emergencies.',
+        traits: ['Refugee background', 'Prior professional experience', 'Cultural adjustment', 'Childcare responsibilities', 'Qualification recognition gap']
+    },
+    {
+        id: 'declan',
+        name: 'Declan',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=DeclanO&top=sides&facialHairProbability=0&skinColor=ffdbb4&hairColor=e8e1e1&size=150',
+        color: '#f39c12',
+        tagline: 'Semi-retired professional pivoting to a second career',
+        narrative: 'Declan is 55 and spent 30 years in IT management before taking early retirement. He wants to retrain as a post-primary teacher. He has a wealth of industry experience but low confidence with modern learning platforms — Moodle, Teams breakout rooms, and online quizzes all feel unfamiliar. He prefers clear structure, printed materials, and face-to-face feedback. He sometimes feels invisible in a cohort of twenty-somethings.',
+        traits: ['Mature learner', 'Career pivoter', 'Industry experience', 'Low digital platform confidence', 'Prefers structured approaches']
+    },
+    {
+        id: 'aoife',
+        name: 'Aoife',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=AoifeK&top=curly&facialHairProbability=0&skinColor=ffdbb4&hairColor=d6b370&size=150',
+        color: '#e67e22',
+        tagline: 'Neurodivergent creative thinker with ADHD & dyslexia',
+        narrative: 'Aoife is 21, diagnosed with ADHD and dyslexia. She\'s a brilliant creative thinker who thrives in project-based work, group brainstorming, and hands-on tasks. Long readings, dense slide decks, and timed written exams are her kryptonite. She needs variety in how content is delivered and assessed. She often loses track of deadlines and benefits enormously from visual schedules and regular check-ins.',
+        traits: ['ADHD', 'Dyslexia', 'Creative learner', 'Needs variety', 'Struggles with long-form reading']
+    },
+    {
+        id: 'priya',
+        name: 'Priya',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=PriyaR&top=straight02&facialHairProbability=0&skinColor=ae5d29&hairColor=2c1b18&size=150',
+        color: '#1abc9c',
+        tagline: 'Remote learner in a different time zone with patchy internet',
+        narrative: 'Priya is 27 and lives in rural Rajasthan, India, studying an Irish programme fully online. Her internet connection is unreliable — video calls drop out and large file downloads fail regularly. There\'s a +5.5 hour time difference, so live evening lectures in Ireland happen after midnight for her. She\'s resourceful and disciplined, but asynchronous-first design and downloadable materials are essential for her success.',
+        traits: ['Remote / online only', 'Time zone difference', 'Unreliable internet', 'Self-disciplined', 'Needs async-first design']
+    },
+    {
+        id: 'marcus',
+        name: 'Marcus',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=MarcusB&top=shortCurly&facialHairProbability=100&facialHair=beardLight&skinColor=614335&hairColor=2c1b18&size=150',
+        color: '#34495e',
+        tagline: 'Senior executive studying part-time for career advancement',
+        narrative: 'Marcus is 42 and leads a team in financial services. He\'s studying part-time to sharpen his strategic skills and credentialise his experience. He travels frequently and has unpredictable work demands — a board crisis can wipe out a study week. He expects content to be relevant, professionally pitched, and efficient. He has zero tolerance for busywork and will disengage fast if he doesn\'t see practical value.',
+        traits: ['Time-poor executive', 'Frequent traveller', 'High expectations', 'Values practical relevance', 'Part-time learner']
+    },
+    {
+        id: 'niamh',
+        name: 'Niamh',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=NiamhD&top=bob&facialHairProbability=0&skinColor=edb98a&hairColor=a55728&size=150',
+        color: '#8e44ad',
+        tagline: 'Legally blind, relies on screen reader software',
+        narrative: 'Niamh is 34 and has been legally blind since childhood. She navigates everything — emails, LMS pages, PDFs, presentations — using JAWS screen reader and a braille display. Unlabelled images, inaccessible PDFs, and videos without captions or audio descriptions are daily frustrations. She\'s articulate, analytically sharp, and an excellent collaborator. She just needs the playing field to be level.',
+        traits: ['Visual impairment', 'Screen reader user', 'Strong analytical skills', 'Needs alt text & captions', 'Braille display user']
+    },
+    {
+        id: 'tomas',
+        name: 'Tomás',
+        avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=TomasG&top=shortWaved&facialHairProbability=0&skinColor=ffdbb4&hairColor=4a312c&size=150',
+        color: '#16a085',
+        tagline: 'First in his family to attend higher education',
+        narrative: 'Tomás is 26 and grew up in a working-class community where nobody went to college. He works part-time in construction to pay his way. He has high potential but limited academic writing experience — he doesn\'t know what "critically evaluate" actually means in an essay. He battles imposter syndrome quietly and sometimes feels like he doesn\'t belong. He needs clear rubrics, scaffolded assignments, and someone who believes in him.',
+        traits: ['First-generation student', 'Working class background', 'Part-time employment', 'Imposter syndrome', 'Needs scaffolding']
+    }
+];
+
+const PERSONA_QUESTIONS = [
+    { id: 'q-access', text: 'Can this learner access all programme materials in the formats provided?' },
+    { id: 'q-workload', text: 'Is the weekly workload realistic given this learner\'s life circumstances?' },
+    { id: 'q-assessment', text: 'Can this learner demonstrate their learning effectively through the chosen assessments?' },
+    { id: 'q-sync', text: 'Can this learner participate meaningfully in synchronous activities (if any)?' },
+    { id: 'q-support', text: 'Are there adequate support structures in place for this learner?' },
+    { id: 'q-multimodal', text: 'Is content presented in multiple formats that work for this learner?' },
+    { id: 'q-community', text: 'Can this learner build meaningful connections with peers and staff?' },
+    { id: 'q-feedback', text: 'Does the feedback approach suit this learner\'s needs and circumstances?' },
+    { id: 'q-deadlines', text: 'Are deadlines and scheduling realistic for this learner?' },
+    { id: 'q-help', text: 'Does this learner have a clear, accessible pathway to seek help when stuck?' }
+];
+
 const BLANK_STATE = {
     programmeTitle: 'New Programme',
     audience: 'Target audience and learners',
@@ -72,6 +179,8 @@ const BLANK_STATE = {
             labs: 0,
             seminars: 0,
             workshops: 0,
+            directedElearning: 0,
+            independentLearning: 0,
             other: 0
         }
     },
@@ -120,7 +229,12 @@ const BLANK_STATE = {
         }
     ],
     createdAt: new Date().toISOString(),
-    lastModified: new Date().toISOString()
+    lastModified: new Date().toISOString(),
+    personas: {
+        active: [],
+        skipped: [],
+        checklists: {}
+    }
 };
 
 // ===== STATE MANAGEMENT =====
@@ -2888,7 +3002,7 @@ function renderDeliveryProfile() {
             deliveryMode: 50,
             syncAsync: 50,
             totalEffortHours: 1500,
-            contactHours: { lectures: 0, tutorials: 0, labs: 0, seminars: 0, workshops: 0, other: 0 }
+            contactHours: { lectures: 0, tutorials: 0, labs: 0, seminars: 0, workshops: 0, directedElearning: 0, independentLearning: 0, other: 0 }
         };
     }
     const dp = appState.deliveryProfile;
@@ -2926,6 +3040,8 @@ function renderDeliveryProfile() {
         { key: 'labs', label: 'Labs / Practicals', icon: '🔬', color: '#198754', desc: 'Hands-on supervised work' },
         { key: 'seminars', label: 'Directed Study', icon: '📖', color: '#fd7e14', desc: 'Supervised reading / study sessions' },
         { key: 'workshops', label: 'Workshops', icon: '🛠️', color: '#dc3545', desc: 'Intensive practical sessions' },
+        { key: 'directedElearning', label: 'Directed e-Learning', icon: '💻', color: '#20c997', desc: 'Structured online activities, e-tivities, LMS tasks' },
+        { key: 'independentLearning', label: 'Independent Learning', icon: '📚', color: '#adb5bd', desc: 'Self-directed study, reading, research, revision' },
         { key: 'other', label: 'Other Contact', icon: '📌', color: '#6c757d', desc: 'Guest speakers, field trips, etc.' }
     ];
 
@@ -2935,7 +3051,7 @@ function renderDeliveryProfile() {
         hours: dp.contactHours[ct.key] || 0,
         color: ct.color
     }));
-    barSegments.push({ label: 'Independent Learning', hours: independentHours, color: '#adb5bd' });
+    barSegments.push({ label: 'Remaining Self-Study', hours: independentHours, color: '#e9ecef' });
 
     let html = `
         <h2 class="mb-1">📡 Delivery & Contact Time Profile</h2>
@@ -3053,7 +3169,7 @@ function renderDeliveryProfile() {
 
                         <hr>
                         <div class="d-flex justify-content-between align-items-center" style="font-size: 0.9rem;">
-                            <span>📚 <strong>Independent Learning & Assessment Prep</strong></span>
+                            <span>� <strong>Remaining Self-Study & Assessment Prep</strong></span>
                             <span style="font-size: 1.1rem; font-weight: 700; color: #adb5bd;" id="independentHoursDisplay">${independentHours}h</span>
                         </div>
                         <div class="mt-2" style="height: 8px; background-color: #dee2e6; border-radius: 4px; overflow: hidden;">
@@ -3869,6 +3985,454 @@ function deleteWeek(weekIndex) {
     }
 }
 
+// ===== PERSONAS TAB =====
+// Track which persona step the wizard is on and which view (wizard vs summary)
+let personaWizardStep = 0;
+let personaView = 'wizard'; // 'wizard' or 'summary'
+
+function renderPersonas() {
+    const container = document.getElementById('contentPersonas');
+    if (!container) return;
+
+    // Ensure state
+    if (!appState.personas) {
+        appState.personas = { active: [], skipped: [], checklists: {} };
+    }
+    if (!appState.personas.skipped) appState.personas.skipped = [];
+
+    // Determine which personas still need review (not yet yes/no/skip decided)
+    const decided = [...(appState.personas.active || []), ...(appState.personas.skipped || [])];
+    const allDecided = PERSONAS.every(p => decided.includes(p.id));
+
+    // If all decided, default to summary view
+    if (allDecided && personaView === 'wizard') {
+        personaView = 'summary';
+    }
+
+    if (personaView === 'summary') {
+        renderPersonaSummary(container);
+    } else {
+        renderPersonaWizard(container);
+    }
+}
+
+function renderPersonaWizard(container) {
+    const decided = [...(appState.personas.active || []), ...(appState.personas.skipped || [])];
+
+    // Clamp step
+    if (personaWizardStep < 0) personaWizardStep = 0;
+    if (personaWizardStep >= PERSONAS.length) personaWizardStep = PERSONAS.length - 1;
+
+    const persona = PERSONAS[personaWizardStep];
+    const isActive = (appState.personas.active || []).includes(persona.id);
+    const isSkipped = (appState.personas.skipped || []).includes(persona.id);
+    const isDecided = isActive || isSkipped;
+    const cl = appState.personas.checklists[persona.id] || {};
+    const answered = PERSONA_QUESTIONS.filter(q => cl[q.id]).length;
+    const pct = Math.round((answered / PERSONA_QUESTIONS.length) * 100);
+
+    // Progress dots
+    let dotsHtml = '<div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">';
+    PERSONAS.forEach((p, i) => {
+        const pActive = (appState.personas.active || []).includes(p.id);
+        const pSkipped = (appState.personas.skipped || []).includes(p.id);
+        const isCurrent = i === personaWizardStep;
+        let dotColor = '#dee2e6'; // undecided
+        let dotBorder = 'transparent';
+        if (pActive) dotColor = p.color;
+        if (pSkipped) dotColor = '#adb5bd';
+        if (isCurrent) dotBorder = '#333';
+
+        dotsHtml += `<button class="persona-dot" data-step="${i}" 
+                       style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid ${dotBorder}; 
+                              background-color: ${dotColor}; cursor: pointer; padding: 0; transition: all 0.2s;"
+                       title="${p.name}${pActive ? ' ✓ Relevant' : pSkipped ? ' — Skipped' : ''}"></button>`;
+    });
+    dotsHtml += '</div>';
+
+    // Count decisions
+    const activeCount = (appState.personas.active || []).length;
+    const decidedCount = decided.length;
+
+    let html = `
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h2 class="mb-1">Learner Personas</h2>
+                <p class="text-muted mb-0" style="max-width: 600px; font-size: 0.9rem;">
+                    Step through each persona. Does your programme work for this person?
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                ${decidedCount > 0 ? `<button class="btn btn-sm btn-outline-primary" id="btnPersonaSummary">📊 View Summary (${activeCount} relevant)</button>` : ''}
+                <span class="badge bg-secondary">${personaWizardStep + 1} / ${PERSONAS.length}</span>
+            </div>
+        </div>
+
+        ${dotsHtml}
+
+        <!-- Persona Card -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <div class="card persona-card active" style="--persona-color: ${persona.color}; border-top: 4px solid ${persona.color};">
+                    <!-- Avatar -->
+                    <div class="text-center pt-4 pb-2">
+                        <div class="persona-avatar mx-auto" style="background-color: ${persona.color}15; border: 3px solid ${persona.color}35;">
+                            <img src="${persona.avatar}" alt="${persona.name}" class="persona-avatar-img">
+                        </div>
+                    </div>
+
+                    <div class="card-body pt-2">
+                        <h4 class="card-title text-center fw-bold mb-1">${persona.name}</h4>
+                        <p class="text-center text-muted mb-3" style="line-height: 1.3;">${persona.tagline}</p>
+
+                        <p class="card-text mb-3" style="font-size: 0.92rem; line-height: 1.6; color: #444;">
+                            ${persona.narrative}
+                        </p>
+
+                        <div class="persona-traits mb-3 text-center">
+                            ${persona.traits.map(t => `<span class="badge me-1 mb-1" style="background-color: ${persona.color}18; color: ${persona.color}; border: 1px solid ${persona.color}40;">${t}</span>`).join('')}
+                        </div>
+
+                        <!-- Decision buttons -->
+                        <div class="text-center mb-3">
+                            <p class="fw-bold mb-2" style="color: #555;">Is this persona relevant to your programme?</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <button class="btn ${isActive ? 'btn-success' : 'btn-outline-success'} px-4" id="btnPersonaYes" data-persona-id="${persona.id}">
+                                    ✅ Yes, relevant
+                                </button>
+                                <button class="btn ${isSkipped ? 'btn-secondary' : 'btn-outline-secondary'} px-4" id="btnPersonaNo" data-persona-id="${persona.id}">
+                                    ❌ No
+                                </button>
+                                <button class="btn btn-outline-light text-muted border px-4" id="btnPersonaSkip" data-persona-id="${persona.id}">
+                                    ⏭️ Skip
+                                </button>
+                            </div>
+                        </div>
+
+                        ${isActive ? `
+                            <hr>
+                            <!-- Checklist -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-bold mb-0" style="color: ${persona.color};">Inclusivity Checklist</h6>
+                                <small class="fw-bold" style="color: ${persona.color};">${answered}/${PERSONA_QUESTIONS.length} ${pct === 100 ? '✅' : ''}</small>
+                            </div>
+                            <div class="persona-progress mb-3">
+                                <div class="persona-progress-bar" style="width: ${pct}%; background-color: ${persona.color};"></div>
+                            </div>
+                            <div class="persona-checklist">
+                                ${PERSONA_QUESTIONS.map(q => `
+                                    <div class="form-check">
+                                        <input class="form-check-input persona-check" type="checkbox"
+                                               data-persona-id="${persona.id}"
+                                               data-question-id="${q.id}"
+                                               id="check-${persona.id}-${q.id}"
+                                               ${cl[q.id] ? 'checked' : ''}>
+                                        <label class="form-check-label" for="check-${persona.id}-${q.id}">
+                                            ${q.text}
+                                        </label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="d-flex justify-content-between mt-3">
+                    <button class="btn btn-outline-secondary" id="btnPersonaPrev" ${personaWizardStep === 0 ? 'disabled' : ''}>
+                        ← Previous
+                    </button>
+                    <button class="btn btn-primary" id="btnPersonaNext" ${personaWizardStep === PERSONAS.length - 1 ? 'disabled' : ''}>
+                        Next →
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+    attachPersonaWizardHandlers();
+}
+
+function renderPersonaSummary(container) {
+    const activeIds = appState.personas.active || [];
+    const skippedIds = appState.personas.skipped || [];
+    const checklists = appState.personas.checklists || {};
+    const activeCount = activeIds.length;
+
+    const totalChecks = activeCount * PERSONA_QUESTIONS.length;
+    let completedChecks = 0;
+    activeIds.forEach(pid => {
+        const cl = checklists[pid] || {};
+        PERSONA_QUESTIONS.forEach(q => { if (cl[q.id]) completedChecks++; });
+    });
+
+    let html = `
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <h2 class="mb-1">Learner Personas — Summary</h2>
+                <p class="text-muted mb-0" style="max-width: 680px; font-size: 0.9rem;">
+                    ${activeCount} persona${activeCount !== 1 ? 's' : ''} marked as relevant. Click any card to revisit, or restart the wizard.
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary" id="btnPersonaRestart">🔄 Restart Wizard</button>
+            </div>
+        </div>
+    `;
+
+    // Overall progress
+    if (activeCount > 0 && totalChecks > 0) {
+        const pct = Math.round((completedChecks / totalChecks) * 100);
+        const barColor = pct === 100 ? '#198754' : pct >= 50 ? '#0d6efd' : '#fd7e14';
+        html += `
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="fw-bold text-muted">Overall Inclusivity Score</small>
+                    <small class="fw-bold" style="color: ${barColor}">${pct}% (${completedChecks}/${totalChecks})</small>
+                </div>
+                <div class="persona-progress" style="height: 8px;">
+                    <div class="persona-progress-bar" style="width: ${pct}%; background-color: ${barColor};"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Relevant personas as cards
+    if (activeCount > 0) {
+        html += `<h5 class="mb-3 fw-bold">✅ Relevant Personas</h5><div class="row g-3 mb-4">`;
+        activeIds.forEach(pid => {
+            const persona = PERSONAS.find(p => p.id === pid);
+            if (!persona) return;
+            const cl = checklists[pid] || {};
+            const answered = PERSONA_QUESTIONS.filter(q => cl[q.id]).length;
+            const pct = Math.round((answered / PERSONA_QUESTIONS.length) * 100);
+            const stepIdx = PERSONAS.findIndex(p => p.id === pid);
+
+            html += `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card persona-card active persona-summary-card" data-step="${stepIdx}" 
+                         style="--persona-color: ${persona.color}; border-top: 4px solid ${persona.color}; cursor: pointer;">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div class="persona-avatar" style="width: 56px; height: 56px; background-color: ${persona.color}15; border: 2px solid ${persona.color}35;">
+                                    <img src="${persona.avatar}" alt="${persona.name}" class="persona-avatar-img">
+                                </div>
+                                <div style="min-width: 0;">
+                                    <h6 class="fw-bold mb-0">${persona.name}</h6>
+                                    <small class="text-muted">${persona.tagline}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small style="color: ${persona.color}; font-weight: 600;">${answered}/${PERSONA_QUESTIONS.length}</small>
+                                <small style="color: ${persona.color}; font-weight: 600;">${pct}%${pct === 100 ? ' ✅' : ''}</small>
+                            </div>
+                            <div class="persona-progress">
+                                <div class="persona-progress-bar" style="width: ${pct}%; background-color: ${persona.color};"></div>
+                            </div>
+                            ${pct < 100 ? `<div class="mt-2"><small class="text-muted">${PERSONA_QUESTIONS.filter(q => !cl[q.id]).length} items remaining</small></div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+    }
+
+    // Skipped/No personas (collapsed)
+    const notRelevant = PERSONAS.filter(p => skippedIds.includes(p.id));
+    if (notRelevant.length > 0) {
+        html += `
+            <details class="mb-4">
+                <summary class="text-muted mb-2" style="cursor: pointer; font-size: 0.9rem;">
+                    <span class="fw-bold">${notRelevant.length} persona${notRelevant.length !== 1 ? 's' : ''} skipped / not relevant</span>
+                </summary>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    ${notRelevant.map(p => {
+                        const stepIdx = PERSONAS.findIndex(pp => pp.id === p.id);
+                        return `<button class="btn btn-sm btn-outline-secondary persona-summary-card d-inline-flex align-items-center gap-1" data-step="${stepIdx}"><img src="${p.avatar}" alt="${p.name}" style="width: 24px; height: 24px; border-radius: 50%;">${p.name}</button>`;
+                    }).join('')}
+                </div>
+            </details>
+        `;
+    }
+
+    // Outstanding concerns
+    if (activeCount > 0) {
+        const concerns = [];
+        activeIds.forEach(pid => {
+            const persona = PERSONAS.find(p => p.id === pid);
+            const cl = checklists[pid] || {};
+            const unchecked = PERSONA_QUESTIONS.filter(q => !cl[q.id]);
+            if (unchecked.length > 0) concerns.push({ persona, unchecked });
+        });
+
+        if (concerns.length > 0) {
+            html += `
+                <div class="card border-warning">
+                    <div class="card-header bg-warning bg-opacity-25">
+                        <h5 class="mb-0">⚠️ Outstanding Concerns</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">These items haven't been addressed yet. Use them as conversation starters with your design team.</p>
+                        ${concerns.map(c => `
+                            <div class="mb-3">
+                                <h6><img src="${c.persona.avatar}" alt="${c.persona.name}" style="width: 28px; height: 28px; border-radius: 50%; vertical-align: middle; margin-right: 6px;"><strong>${c.persona.name}</strong> <small class="text-muted">(${c.unchecked.length} remaining)</small></h6>
+                                <ul class="small mb-0">
+                                    ${c.unchecked.map(q => `<li class="text-muted">${q.text}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="alert alert-success">
+                    <h5 class="alert-heading mb-1">✅ All checks complete!</h5>
+                    <p class="mb-0 small">You've reviewed every inclusivity question for all relevant personas.</p>
+                </div>
+            `;
+        }
+    }
+
+    if (activeCount === 0) {
+        html += `
+            <div class="alert alert-light border text-center py-5">
+                <p class="fs-5 mb-2">No personas marked as relevant yet.</p>
+                <button class="btn btn-primary" id="btnPersonaRestart2">🔄 Start Wizard</button>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+    attachPersonaSummaryHandlers();
+}
+
+function attachPersonaWizardHandlers() {
+    // Navigation
+    document.getElementById('btnPersonaPrev')?.addEventListener('click', () => {
+        personaWizardStep = Math.max(0, personaWizardStep - 1);
+        renderPersonas();
+    });
+    document.getElementById('btnPersonaNext')?.addEventListener('click', () => {
+        personaWizardStep = Math.min(PERSONAS.length - 1, personaWizardStep + 1);
+        renderPersonas();
+    });
+
+    // Dot navigation
+    document.querySelectorAll('.persona-dot').forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            personaWizardStep = parseInt(e.target.dataset.step);
+            renderPersonas();
+        });
+    });
+
+    // Yes
+    document.getElementById('btnPersonaYes')?.addEventListener('click', (e) => {
+        const pid = e.target.dataset.personaId;
+        if (!appState.personas) appState.personas = { active: [], skipped: [], checklists: {} };
+        // Remove from skipped if it was there
+        appState.personas.skipped = (appState.personas.skipped || []).filter(id => id !== pid);
+        // Add to active
+        if (!appState.personas.active.includes(pid)) {
+            appState.personas.active.push(pid);
+        }
+        // Initialise checklist
+        if (!appState.personas.checklists[pid]) {
+            appState.personas.checklists[pid] = {};
+            PERSONA_QUESTIONS.forEach(q => { appState.personas.checklists[pid][q.id] = false; });
+        }
+        saveToLocalStorage();
+        renderPersonas();
+    });
+
+    // No
+    document.getElementById('btnPersonaNo')?.addEventListener('click', (e) => {
+        const pid = e.target.dataset.personaId;
+        if (!appState.personas) appState.personas = { active: [], skipped: [], checklists: {} };
+        appState.personas.active = (appState.personas.active || []).filter(id => id !== pid);
+        if (!appState.personas.skipped) appState.personas.skipped = [];
+        if (!appState.personas.skipped.includes(pid)) {
+            appState.personas.skipped.push(pid);
+        }
+        saveToLocalStorage();
+        // Auto-advance to next undecided persona
+        autoAdvanceWizard();
+        renderPersonas();
+    });
+
+    // Skip
+    document.getElementById('btnPersonaSkip')?.addEventListener('click', (e) => {
+        const pid = e.target.dataset.personaId;
+        if (!appState.personas) appState.personas = { active: [], skipped: [], checklists: {} };
+        appState.personas.active = (appState.personas.active || []).filter(id => id !== pid);
+        if (!appState.personas.skipped) appState.personas.skipped = [];
+        if (!appState.personas.skipped.includes(pid)) {
+            appState.personas.skipped.push(pid);
+        }
+        saveToLocalStorage();
+        autoAdvanceWizard();
+        renderPersonas();
+    });
+
+    // Summary button
+    document.getElementById('btnPersonaSummary')?.addEventListener('click', () => {
+        personaView = 'summary';
+        renderPersonas();
+    });
+
+    // Checklist
+    document.querySelectorAll('.persona-check').forEach(check => {
+        check.addEventListener('change', (e) => {
+            const personaId = e.target.dataset.personaId;
+            const questionId = e.target.dataset.questionId;
+            if (!appState.personas.checklists[personaId]) appState.personas.checklists[personaId] = {};
+            appState.personas.checklists[personaId][questionId] = e.target.checked;
+            saveToLocalStorage();
+            renderPersonas();
+        });
+    });
+}
+
+function attachPersonaSummaryHandlers() {
+    document.getElementById('btnPersonaRestart')?.addEventListener('click', () => {
+        personaWizardStep = 0;
+        personaView = 'wizard';
+        renderPersonas();
+    });
+    document.getElementById('btnPersonaRestart2')?.addEventListener('click', () => {
+        personaWizardStep = 0;
+        personaView = 'wizard';
+        renderPersonas();
+    });
+
+    // Click card to jump to that persona in wizard
+    document.querySelectorAll('.persona-summary-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const step = parseInt(e.currentTarget.dataset.step);
+            personaWizardStep = step;
+            personaView = 'wizard';
+            renderPersonas();
+        });
+    });
+}
+
+function autoAdvanceWizard() {
+    const decided = [...(appState.personas.active || []), ...(appState.personas.skipped || [])];
+    // Try to find next undecided
+    for (let i = personaWizardStep + 1; i < PERSONAS.length; i++) {
+        if (!decided.includes(PERSONAS[i].id)) {
+            personaWizardStep = i;
+            return;
+        }
+    }
+    // If none ahead, just go to next
+    if (personaWizardStep < PERSONAS.length - 1) {
+        personaWizardStep++;
+    }
+}
+
 // ===== ROADMAP TAB =====
 function renderRoadmap() {
     const container = document.getElementById('roadmapContent');
@@ -3989,10 +4553,12 @@ function renderRoadmap() {
                     { key: 'labs', label: 'Labs', color: '#198754' },
                     { key: 'seminars', label: 'Directed Study', color: '#fd7e14' },
                     { key: 'workshops', label: 'Workshops', color: '#dc3545' },
+                    { key: 'directedElearning', label: 'Directed e-Learning', color: '#20c997' },
+                    { key: 'independentLearning', label: 'Independent Learning', color: '#adb5bd' },
                     { key: 'other', label: 'Other', color: '#6c757d' }
                 ];
                 const segments = contactTypes.map(ct => ({ label: ct.label, hours: dp.contactHours?.[ct.key] || 0, color: ct.color }));
-                segments.push({ label: 'Independent', hours: independentHours, color: '#adb5bd' });
+                segments.push({ label: 'Remaining Self-Study', hours: independentHours, color: '#e9ecef' });
 
                 return `
                     <div class="row">
@@ -4038,6 +4604,47 @@ function renderRoadmap() {
             <p class="text-muted small">Overview of Teaching and Social presence elements configured for your programme. These elements support instructor engagement and learner community-building across the programme.</p>
             
             ${renderCOIPresenceHeatmap()}
+        </div>
+
+        <div class="roadmap-section">
+            <h3>🧑‍🤝‍🧑 Learner Personas — Inclusivity Check</h3>
+            ${(() => {
+                const activeIds = (appState.personas?.active) || [];
+                const checklists = appState.personas?.checklists || {};
+                if (activeIds.length === 0) {
+                    return '<p class="text-muted small">No personas activated. Activate personas in the Personas tab to include an inclusivity summary here.</p>';
+                }
+                let out = '<div class="row g-3">';
+                activeIds.forEach(pid => {
+                    const persona = PERSONAS.find(p => p.id === pid);
+                    if (!persona) return;
+                    const cl = checklists[pid] || {};
+                    const answered = PERSONA_QUESTIONS.filter(q => cl[q.id]).length;
+                    const total = PERSONA_QUESTIONS.length;
+                    const pct = Math.round((answered / total) * 100);
+                    const barColor = pct === 100 ? '#198754' : pct >= 50 ? '#0d6efd' : '#fd7e14';
+                    const unchecked = PERSONA_QUESTIONS.filter(q => !cl[q.id]);
+                    out += `
+                        <div class="col-md-6 col-lg-4">
+                            <div style="border: 1px solid #dee2e6; border-radius: 8px; padding: 0.75rem; border-left: 4px solid ${persona.color};">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <img src="${persona.avatar}" alt="${persona.name}" style="width: 40px; height: 40px; border-radius: 50%;">
+                                    <div>
+                                        <strong>${persona.name}</strong>
+                                        <br><small class="text-muted">${answered}/${total} checks (${pct}%)</small>
+                                    </div>
+                                </div>
+                                <div class="persona-progress" style="height: 5px; margin-bottom: 0.4rem;">
+                                    <div class="persona-progress-bar" style="width: ${pct}%; background-color: ${barColor};"></div>
+                                </div>
+                                ${unchecked.length > 0 ? `<ul class="small mb-0" style="padding-left: 1.2rem; color: #6c757d;">${unchecked.slice(0, 3).map(q => '<li>' + q.text + '</li>').join('')}${unchecked.length > 3 ? '<li><em>+' + (unchecked.length - 3) + ' more…</em></li>' : ''}</ul>` : '<span class="badge bg-success">✅ All clear</span>'}
+                            </div>
+                        </div>
+                    `;
+                });
+                out += '</div>';
+                return out;
+            })()}
         </div>
 
         <div class="roadmap-section">
@@ -4815,6 +5422,7 @@ function saveModuleLearningActivity() {
 // ===== RENDER ALL / INIT =====
 function renderAllTabs() {
     renderCanvas();
+    renderPersonas();
     renderBackwardDesign();
     renderAlignmentMap();
     renderModuleStudio();
@@ -4889,6 +5497,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(renderLearningExperience, 500);
     });
 
+    document.getElementById('tabPersonas')?.addEventListener('click', () => {
+        setTimeout(renderPersonas, 500);
+    });
+
     document.getElementById('tabRoadmap')?.addEventListener('click', () => {
         setTimeout(renderRoadmap, 500);
     });
@@ -4898,4 +5510,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     showToast('Programme Design Studio loaded!', 'success');
+
+    // ===== WELCOME/SPLASH PAGE =====
+    const WELCOME_DISMISSED_KEY = 'programmeDesignStudio_welcomeDismissed';
+
+    function showWelcomeModal() {
+        const modalEl = document.getElementById('welcomeModal');
+        if (!modalEl) return;
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+
+    // Show welcome on first visit (or if user hasn't dismissed it)
+    if (!localStorage.getItem(WELCOME_DISMISSED_KEY)) {
+        showWelcomeModal();
+    }
+
+    // "Let's Get Started" button
+    document.getElementById('btnWelcomeStart')?.addEventListener('click', () => {
+        const dontShow = document.getElementById('welcomeDontShowAgain')?.checked;
+        if (dontShow) {
+            localStorage.setItem(WELCOME_DISMISSED_KEY, 'true');
+        }
+        bootstrap.Modal.getInstance(document.getElementById('welcomeModal'))?.hide();
+    });
+
+    // Header "Help" button to re-open splash
+    document.getElementById('btnHelp')?.addEventListener('click', () => {
+        showWelcomeModal();
+    });
 });
